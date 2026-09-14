@@ -1,0 +1,35 @@
+# Multimodal Fusion Architectures Configuration
+model_type: "gated_multimodal_fusion" # Options: "late_fusion", "intermediate_fusion", "gated_fusion", "cross_attention"
+
+architectures:
+  late_fusion:
+    structured_weight: 0.55
+    text_weight: 0.45
+    learnable_weights: true
+
+  intermediate_fusion:
+    structured_embedding_dim: 64
+    text_embedding_dim: 128
+    hidden_dims: [128, 64]
+    dropout: 0.3
+
+  gated_fusion:
+    structured_embedding_dim: 64
+    text_embedding_dim: 128
+    gate_hidden_dim: 64
+    dropout: 0.25
+    use_residual: true
+
+  cross_attention:
+    num_heads: 4
+    embed_dim: 64
+    dropout: 0.2
+
+training:
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  batch_size: 32
+  epochs: 30
+  patience: 7
+  pos_weight: 3.5
+  mc_dropout_samples: 30

@@ -130,3 +130,46 @@ def get_roc_and_pr_curves(y_true: np.ndarray, y_prob: np.ndarray) -> Dict[str, A
         "roc": {"fpr": fpr.tolist(), "tpr": tpr.tolist()},
         "pr": {"precision": prec.tolist(), "recall": rec.tolist()},
     }
+
+
+def paired_delong_permutation_test(
+    y_true: np.ndarray,
+    prob_a: np.ndarray,
+    prob_b: np.ndarray,
+    n_permutations: int = 2000,
+    seed: int = 42,
+) -> Dict[str, float]:
+    """
+    Computes empirical paired permutation test for difference in AUROC between two models:
+    H0: Model A and Model B have identical discrimination (AUROC_A == AUROC_B).
+    """
+    rng = np.random.default_rng(seed)
+    y = np.array(y_true).ravel()
+    pa = np.array(prob_a).ravel()
+    pb = np.array(prob_b).ravel()
+
+    auc_a = float(roc_auc_score(y, pa))
+    auc_b = float(roc_auc_score(y, pb))
+    observed_diff = auc_a - auc_b
+
+    count_extreme = 0
+    N = len(y)
+
+    for _ in range(n_permutations):
+        # Swap predictions randomly with probability 0.5 per sample
+        swap_mask = rng.random(N) > 0.5
+        perm_pa = np.where(swap_mask, pb, pa)
+        perm_pb = np.where(swap_mask, pa, pb)
+
+        perm_diff = float(roc_auc_score(y, perm_pa)) - float(roc_auc_score(y, perm_pb))
+        if abs(perm_diff) >= abs(observed_diff):
+            count_extreme += 1
+
+    p_value = float(count_extreme) / float(n_permutations)
+    return {
+        "auroc_model_a": round(auc_a, 4),
+        "auroc_model_b": round(auc_b, 4),
+        "delta_auroc": round(observed_diff, 4),
+        "p_value": round(p_value, 5),
+        "is_statistically_significant": bool(p_value < 0.05),
+    }

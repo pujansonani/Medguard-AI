@@ -1,0 +1,17 @@
+# Clinical Domain Transformer (ClinicalBERT / BioClinicalBERT) Configuration
+model_type: "clinical_bert"
+pretrained_model_name: "emilyalsentzer/Bio_ClinicalBERT"
+fallback_model_name: "distilbert-base-uncased" # Fast CPU fallback if Bio_ClinicalBERT is unavailable
+max_seq_length: 512
+chunk_size: 256
+chunk_stride: 128
+embedding_dim: 128 # Projected embedding dimension
+pooling_strategy: "attention" # "mean", "cls", or "attention"
+dropout: 0.2
+cache_embeddings: true
+cache_dir: "data/processed/text_embeddings_cache"
+learning_rate: 0.00002
+batch_size: 16
+epochs: 15
+freeze_backbone_epochs: 3
+pos_weight: 3.5

@@ -1,0 +1,12 @@
+# XGBoost Baseline Configuration
+model_type: "xgboost"
+n_estimators: 200
+max_depth: 4
+learning_rate: 0.05
+subsample: 0.8
+colsample_bytree: 0.8
+min_child_weight: 3
+scale_pos_weight: 3.5 # Handles ~18% class imbalance
+random_state: 42
+eval_metric: "logloss"
+early_stopping_rounds: 20

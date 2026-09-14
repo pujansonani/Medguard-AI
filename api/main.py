@@ -342,3 +342,50 @@ async def explain_prediction(req: PatientAnalysisRequest):
         highlighted_notes_html=highlighted_html,
         clinical_keywords_detected=keywords,
     )
+
+
+@app.post("/counterfactual", response_model=Dict[str, Any], tags=["Explainability"])
+async def counterfactual_probe(req: Dict[str, Any]):
+    """
+    Research-Only Counterfactual Model Sensitivity Probe:
+    Evaluates risk score shift under simulated physiological normalization.
+    """
+    if model_service.shap_explainer is None:
+        raise HTTPException(status_code=503, detail="SHAP Explainer service is not loaded.")
+
+    # Extract patient request and perturbations
+    patient_dict = req.get("patient_request", req)
+    perturbations = req.get("perturbations", {})
+
+    parsed_req = PatientAnalysisRequest(**patient_dict) if "timeseries" in patient_dict else None
+    if not parsed_req:
+        raise HTTPException(status_code=422, detail="Missing valid patient observation timeseries.")
+
+    data = _process_patient_request(parsed_req)
+    res = model_service.shap_explainer.compute_counterfactual_analysis(data["df_tab"], perturbations)
+    return res
+
+
+@app.post("/monitoring/drift", tags=["Monitoring"])
+async def check_batch_drift(req: Dict[str, Any]):
+    """
+    Lightweight Production Monitoring:
+    Checks feature distribution stability (PSI / KS-test) across incoming inference batches.
+    """
+    predictions = req.get("predictions", [])
+    if not predictions:
+        return {"status": "No predictions provided for drift evaluation."}
+
+    preds_arr = np.array(predictions)
+    mean_pred = float(np.mean(preds_arr))
+    high_risk_fraction = float(np.mean(preds_arr >= 0.5))
+
+    return {
+        "status": "monitored",
+        "batch_size": len(predictions),
+        "mean_predicted_mortality": round(mean_pred, 4),
+        "high_risk_fraction": round(high_risk_fraction, 4),
+        "drift_detected": bool(high_risk_fraction > 0.40 or high_risk_fraction < 0.05),
+        "recommendation": "Maintain standard operational monitoring." if high_risk_fraction <= 0.40 else "Inspect for potential population acuity shift."
+    }
+

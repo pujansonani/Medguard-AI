@@ -157,3 +157,50 @@ class MedguardSHAPExplainer:
             })
 
         return hourly_attributions
+
+    def compute_counterfactual_analysis(
+        self,
+        instance_df: pd.DataFrame,
+        perturbations: Dict[str, float],
+    ) -> Dict[str, Any]:
+        """
+        Research-Only Counterfactual Model Sensitivity Probe.
+        
+        Evaluates how model mortality predictions change when selected physiological
+        variables are shifted toward normal physiological reference ranges.
+
+        CRITICAL RESEARCH DISCLAIMER:
+        This function is strictly for model sensitivity analysis and does NOT
+        constitute clinical treatment recommendations, triage guidance, or clinical advice.
+        """
+        if not hasattr(self.model, "predict_proba"):
+            raise ValueError("Model does not support predict_proba.")
+
+        # Baseline prediction
+        base_prob = float(self.model.predict_proba(instance_df.values)[0])
+        
+        # Perturbed instance
+        cf_df = instance_df.copy()
+        applied_perturbations = {}
+        for col, new_val in perturbations.items():
+            if col in cf_df.columns:
+                orig_val = float(cf_df[col].iloc[0])
+                cf_df[col] = new_val
+                applied_perturbations[col] = {
+                    "original_value": round(orig_val, 2),
+                    "counterfactual_value": round(float(new_val), 2),
+                    "shift": round(float(new_val - orig_val), 2),
+                }
+
+        cf_prob = float(self.model.predict_proba(cf_df.values)[0])
+        prob_delta = cf_prob - base_prob
+
+        return {
+            "disclaimer": "RESEARCH PROTOTYPE ONLY: Counterfactual sensitivity analysis for model interpretability, NOT clinical recommendation.",
+            "original_mortality_risk": round(base_prob, 4),
+            "counterfactual_mortality_risk": round(cf_prob, 4),
+            "risk_delta": round(prob_delta, 4),
+            "risk_reduction_pct": round(max(0.0, (base_prob - cf_prob) / max(1e-4, base_prob)) * 100, 2),
+            "perturbations": applied_perturbations,
+        }
+

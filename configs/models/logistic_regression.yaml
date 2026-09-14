@@ -1,0 +1,9 @@
+# Logistic Regression Baseline Configuration
+model_type: "logistic_regression"
+penalty: "l2"
+C: 1.0
+solver: "lbfgs"
+max_iter: 1000
+class_weight: "balanced"
+random_state: 42
+features: "tabular_summary" # 24h min, max, mean, std, trend, delta

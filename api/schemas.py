@@ -95,3 +95,33 @@ class ModelInfoResponse(BaseModel):
     prediction_horizon_hours: float
     calibration_temperature: float
     features_monitored: List[str]
+
+
+class CounterfactualRequest(BaseModel):
+    patient_request: PatientAnalysisRequest
+    perturbations: Dict[str, float] = Field(
+        ...,
+        description="Target feature adjustments within physiological range (e.g. {'map_min': 75.0, 'lactate_max': 1.5})"
+    )
+
+
+class CounterfactualResponse(BaseModel):
+    disclaimer: str
+    original_mortality_risk: float
+    counterfactual_mortality_risk: float
+    risk_delta: float
+    risk_reduction_pct: float
+    perturbations: Dict[str, Dict[str, float]]
+
+
+class DriftBatchRequest(BaseModel):
+    observations: List[HourlyObservation]
+    predictions: List[float]
+
+
+class DriftBatchResponse(BaseModel):
+    total_samples: int
+    features_analyzed: int
+    prediction_psi: float
+    drift_alert: bool
+    summary: str

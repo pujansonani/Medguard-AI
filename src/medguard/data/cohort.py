@@ -77,8 +77,8 @@ def split_cohort_patient_level(
         .reset_index()
     )
     
-    patients = patient_df[patient_col].values
-    labels = patient_df[stratify_col].values
+    patients = np.array(patient_df[patient_col].tolist())
+    labels = np.array(patient_df[stratify_col].tolist())
     
     # First split: Train vs Temp (Val + Test)
     temp_ratio = val_ratio + test_ratio

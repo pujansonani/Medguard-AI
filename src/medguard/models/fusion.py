@@ -350,6 +350,50 @@ class MedguardMultimodalModel(MultimodalModel):
         std_probs = np.std(stacked, axis=0)
         return mean_probs, std_probs
 
+    def decompose_modality_contributions(
+        self,
+        X_struct: np.ndarray,
+        mask_struct: np.ndarray,
+        texts: List[str],
+        horizon_idx: int = 3, # Default: 48h horizon
+    ) -> List[Dict[str, float]]:
+        """
+        Decomposes risk for each patient into:
+        - Structured-only risk: P(mortality | vitals, labs)
+        - Text-only risk: P(mortality | clinical notes)
+        - Multimodal risk: P(mortality | vitals, labs, notes)
+        - Delta gains: (P_multi - P_struct) and (P_multi - P_text)
+        - Gating weight: g in [0, 1]
+        """
+        self.net.eval()
+        with torch.no_grad():
+            bx_s = torch.tensor(X_struct, dtype=torch.float32).to(self.device)
+            bmask_s = torch.tensor(mask_struct, dtype=torch.float32).to(self.device)
+            b_ids, b_mask_t = self._tokenize_batch(texts)
+            out = self.net(bx_s, bmask_s, b_ids, b_mask_t)
+
+            p_fused = torch.sigmoid(out["logits"][:, horizon_idx]).cpu().numpy()
+            p_struct = torch.sigmoid(out["logits_struct"][:, horizon_idx]).cpu().numpy()
+            p_text = torch.sigmoid(out["logits_text"][:, horizon_idx]).cpu().numpy()
+            
+            gate = out["gate_weights"]
+            g_vals = gate.mean(dim=-1).cpu().numpy() if gate is not None else np.full(len(p_fused), 0.5)
+
+        results = []
+        for i in range(len(p_fused)):
+            pf = float(p_fused[i])
+            ps = float(p_struct[i])
+            pt = float(p_text[i])
+            results.append({
+                "multimodal_prob": round(pf, 4),
+                "structured_prob": round(ps, 4),
+                "text_prob": round(pt, 4),
+                "gate_weight": round(float(g_vals[i]), 4),
+                "delta_vs_structured": round(pf - ps, 4),
+                "delta_vs_text": round(pf - pt, 4),
+            })
+        return results
+
     def get_modality_weights(
         self,
         X_struct: np.ndarray,

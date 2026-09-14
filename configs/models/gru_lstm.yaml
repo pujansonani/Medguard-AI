@@ -1,0 +1,17 @@
+# Recurrent Neural Network (GRU / LSTM) Configuration
+model_type: "gru" # "gru" or "lstm"
+hidden_dim: 64
+num_layers: 2
+dropout: 0.25
+bidirectional: false
+use_missingness_mask: true
+use_time_decay: true
+input_dim: 24 # 12 continuous features + 12 missingness mask indicators
+output_dim: 1
+learning_rate: 0.001
+weight_decay: 0.0001
+batch_size: 32
+epochs: 25
+patience: 6
+pos_weight: 3.5
+mc_dropout_samples: 30

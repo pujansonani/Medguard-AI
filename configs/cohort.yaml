@@ -1,0 +1,45 @@
+# ==============================================================================
+# MEDGUARD AI: ICU Cohort Definition & Selection Criteria
+# ==============================================================================
+
+cohort_definition:
+  target_population: "Adult ICU patients with continuous physiological monitoring"
+  database: "MIMIC-IV v2.2 & MIMIC-IV-Note v2.2"
+  prediction_task: "48-Hour ICU In-Hospital Mortality Prediction"
+
+# Inclusion & Exclusion Criteria Waterfall
+criteria:
+  min_age: 18 # Exclude pediatric admissions (<18 years old)
+  min_icu_los_hours: 24.0 # ICU length of stay must be >= 24h
+  max_icu_los_days: 30.0 # Exclude extreme outliers (>30 days)
+  observation_window_hours: 24.0 # First 24 hours of ICU stay
+  prediction_horizon_hours: 48.0 # Primary target: mortality within 48h after window
+  multi_horizons_hours: [6.0, 12.0, 24.0, 48.0] # Configurable multi-horizon targets
+  
+  # Temporal Leakage Controls
+  exclude_discharge_summaries: true # Discharge summaries contain future outcome info
+  exclude_notes_after_observation_window: true # Notes written >24h are strictly discarded
+  exclude_observations_after_window: true # Vitals/labs recorded >24h strictly discarded
+  first_icu_stay_only: true # Include only first ICU admission per patient
+  
+  # Data Sufficiency Requirements
+  min_vital_measurements: 6 # Minimum distinct vital sign timepoints in 24h
+  require_heart_rate: true # Must have at least 1 heart rate record
+  require_blood_pressure: true # Must have at least 1 BP record
+  allow_missing_notes: true # If no notes within 24h, use empty note embedding
+
+# Temporal Binning Configuration
+temporal_grid:
+  time_step_hours: 1.0 # 1-hour temporal bins
+  sequence_length: 24 # 24 hourly steps per stay
+  aggregation_strategy: "mean" # Mean aggregation within hourly bin
+  imputation_strategy: "forward_fill_with_decay" # Forward fill + missingness mask
+  max_forward_fill_hours: 6.0 # Beyond 6 hours, decay toward population baseline
+
+# Patient Splitting Configuration (Strictly Patient-Level)
+splitting:
+  strategy: "patient_stratified" # Stratified by mortality outcome at subject_id level
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  random_seed: 42

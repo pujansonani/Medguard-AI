@@ -39,6 +39,8 @@ class TemporalStandardScaler:
                 self.mean_[d] = 0.0
                 self.std_[d] = 1.0
 
+        self.means_ = self.mean_
+        self.stds_ = self.std_
         return self
 
     def transform(self, X: np.ndarray) -> np.ndarray:

@@ -76,3 +76,35 @@ class AblationStudyRunner:
         if not df.empty:
             df = df.sort_values(by="AUROC_raw", ascending=False).reset_index(drop=True)
         return df
+
+    def compute_modality_gain(self, fusion_model_name: str = "Multimodal Gated Fusion", struct_model_name: str = "XGBoost", text_model_name: str = "ClinicalBERT") -> Dict[str, Any]:
+        """
+        Computes exact empirical performance gain (Δ AUROC, Δ AUPRC, Δ Brier)
+        directly answering the central research question.
+        """
+        if fusion_model_name not in self.results or struct_model_name not in self.results:
+            return {"status": "Models not registered yet"}
+
+        f_metrics = self.results[fusion_model_name]["metrics"]
+        s_metrics = self.results[struct_model_name]["metrics"]
+        t_metrics = self.results.get(text_model_name, {}).get("metrics", {})
+
+        return {
+            "fusion_model": fusion_model_name,
+            "structured_baseline": struct_model_name,
+            "text_baseline": text_model_name,
+            "delta_auroc_vs_structured": round(f_metrics["auroc"] - s_metrics["auroc"], 4),
+            "delta_auprc_vs_structured": round(f_metrics["auprc"] - s_metrics["auprc"], 4),
+            "delta_brier_vs_structured": round(f_metrics["brier_score"] - s_metrics["brier_score"], 4),
+            "delta_auroc_vs_text": round(f_metrics["auroc"] - t_metrics.get("auroc", 0.0), 4) if t_metrics else None,
+            "delta_auprc_vs_text": round(f_metrics["auprc"] - t_metrics.get("auprc", 0.0), 4) if t_metrics else None,
+        }
+
+    def save_results_csv(self, filepath: str = "experiments/artifacts/results.csv") -> None:
+        """Saves tabular comparison results to CSV."""
+        df = self.get_summary_table()
+        import os
+        os.makedirs(os.path.dirname(filepath), exist_ok=True)
+        df.to_csv(filepath, index=False)
+        logger.info(f"Saved ablation results table to {filepath}")
+
