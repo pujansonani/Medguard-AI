@@ -1,0 +1,93 @@
+# ==============================================================================
+# MEDGUARD AI: Model Architectures & Hyperparameters Configuration
+# ==============================================================================
+
+# Structured Tabular Baselines
+logistic_regression:
+  penalty: "l2"
+  C: 1.0
+  solver: "lbfgs"
+  max_iter: 1000
+  class_weight: "balanced"
+
+xgboost:
+  n_estimators: 200
+  max_depth: 5
+  learning_rate: 0.05
+  subsample: 0.8
+  colsample_bytree: 0.8
+  scale_pos_weight: 3.5
+  eval_metric: "auc"
+  random_state: 42
+
+lightgbm:
+  n_estimators: 200
+  max_depth: 5
+  num_leaves: 31
+  learning_rate: 0.05
+  subsample: 0.8
+  colsample_bytree: 0.8
+  scale_pos_weight: 3.5
+  random_state: 42
+
+# Structured Temporal Sequence Models
+temporal_gru:
+  hidden_dim: 64
+  num_layers: 2
+  dropout: 0.3
+  bidirectional: false
+  embedding_dim: 64
+
+temporal_lstm:
+  hidden_dim: 64
+  num_layers: 2
+  dropout: 0.3
+  bidirectional: false
+  embedding_dim: 64
+
+temporal_tcn:
+  num_channels: [32, 64, 64]
+  kernel_size: 3
+  dropout: 0.3
+  embedding_dim: 64
+
+# Clinical NLP Transformer Encoder
+clinical_nlp:
+  model_name: "emilyalsentzer/Bio_ClinicalBERT"
+  fallback_model: "distilbert-base-uncased"
+  embedding_dim: 128 # Projected clinical note embedding dimension
+  freeze_backbone: false
+  fine_tune_layers: 2
+  dropout: 0.2
+
+# Multimodal Fusion Architectures
+fusion:
+  # Gated Multimodal Fusion
+  gated:
+    structured_dim: 64
+    text_dim: 128
+    fusion_dim: 128
+    dropout: 0.3
+
+  # Intermediate Concatenation Fusion
+  intermediate:
+    structured_dim: 64
+    text_dim: 128
+    fusion_dim: 128
+    dropout: 0.3
+
+  # Late Fusion (Probability / Logit ensemble weighting)
+  late:
+    init_alpha: 0.5 # initial weight for structured vs text
+
+  # Cross-Modal Attention Fusion (Experimental)
+  cross_attention:
+    num_heads: 4
+    embed_dim: 64
+    dropout: 0.2
+
+# Multi-Horizon Prediction Head
+multi_horizon_head:
+  hidden_dims: [64, 32]
+  horizons: [6, 12, 24, 48]
+  dropout: 0.25

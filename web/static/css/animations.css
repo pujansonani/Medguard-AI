@@ -1,0 +1,318 @@
+/* ==============================================================================
+   MEDGUARD AI: Clinera-Style Ambient Orbs, Motion, Particles & Holographic CSS
+   ============================================================================== */
+
+/* Ambient Grid & Scanline Background */
+.ambient-matrix-bg {
+  position: relative;
+  overflow-x: hidden;
+  overflow-y: visible;
+  min-height: 100vh;
+}
+
+.ambient-matrix-bg::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(62, 207, 178, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(62, 207, 178, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: -1px -1px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Conic Border Glow with Clinera Teal */
+.conic-glow-card {
+  position: relative;
+  background: var(--navy);
+  border-radius: var(--r-lg);
+  padding: 2px;
+  overflow: hidden;
+  box-shadow: 0 16px 50px -10px rgba(62, 207, 178, 0.25);
+}
+
+.conic-glow-card::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg,
+    #1E3A5F 90deg,
+    #3ECFB2 180deg,
+    #7CEFD8 270deg,
+    transparent 360deg
+  );
+  animation: rotate-conic 7s linear infinite;
+  z-index: 0;
+}
+
+.conic-glow-inner {
+  position: relative;
+  background: var(--navy-card);
+  border-radius: calc(var(--r-lg) - 2px);
+  padding: 24px;
+  z-index: 1;
+}
+
+@keyframes rotate-conic {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Floating Levitation Animation */
+.float-element {
+  animation: floating 4s ease-in-out infinite;
+}
+
+.float-element-slow {
+  animation: floating 6s ease-in-out infinite;
+}
+
+.float-element-delay {
+  animation: floating 5s ease-in-out infinite 1.5s;
+}
+
+@keyframes floating {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Live ECG Waveform Container */
+.ecg-monitor-deck {
+  background: #061422;
+  border: 1px solid var(--border-teal);
+  border-radius: var(--r-md);
+  padding: 16px 20px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 30px rgba(62, 207, 178, 0.12);
+}
+
+.ecg-grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    linear-gradient(rgba(62, 207, 178, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(62, 207, 178, 0.08) 1px, transparent 1px);
+  background-size: 16px 16px;
+  pointer-events: none;
+}
+
+.ecg-canvas {
+  width: 100%;
+  height: 90px;
+  display: block;
+}
+
+/* Neural Network Interactive Canvas */
+.neural-canvas-container {
+  width: 100%;
+  height: 380px;
+  background: radial-gradient(circle at center, #153250 0%, #08192A 80%);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-teal);
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.6);
+}
+
+.neural-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Interactive Video / Simulation Walkthrough Player */
+.sim-player-wrapper {
+  background: #061422;
+  border: 1px solid var(--border-teal);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+
+.sim-hud-header {
+  background: rgba(15, 43, 70, 0.9);
+  backdrop-filter: blur(12px);
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sim-controls-bar {
+  background: rgba(15, 43, 70, 0.92);
+  padding: 14px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.sim-timeline-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  position: relative;
+  cursor: pointer;
+}
+
+.sim-timeline-progress {
+  height: 100%;
+  background: linear-gradient(90deg, var(--navy-mid), var(--teal), #7CEFD8);
+  border-radius: 999px;
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+.sim-speed-selector {
+  display: flex;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.speed-btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: var(--font-mono);
+}
+
+.speed-btn:hover, .speed-btn.active {
+  background: var(--teal);
+  color: var(--navy);
+}
+
+.sim-chapter-tabs {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  margin-bottom: 18px;
+  padding-bottom: 4px;
+}
+
+.chapter-tab {
+  background: var(--navy-card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.chapter-tab:hover, .chapter-tab.active {
+  background: var(--teal);
+  color: var(--navy);
+  border-color: transparent;
+  font-weight: 700;
+  box-shadow: 0 4px 14px var(--teal-glow);
+}
+
+.sim-monitor-viewport {
+  width: 100%;
+  height: 230px;
+  background: #040d17;
+  position: relative;
+  overflow: hidden;
+}
+
+.sim-monitor-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.sim-alert-overlay {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  width: 90%;
+  max-width: 650px;
+}
+
+.alert-pulse-box {
+  background: rgba(255, 95, 86, 0.22);
+  border: 1px solid rgba(255, 95, 86, 0.7);
+  backdrop-filter: blur(12px);
+  border-radius: var(--r-md);
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 0 30px rgba(255, 95, 86, 0.5);
+  animation: alert-flash 1.2s infinite alternate;
+}
+
+.sim-marker {
+  position: absolute;
+  top: -3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+  border: 2px solid var(--navy);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+/* Glowing Neon Badges */
+.neon-glow-teal {
+  box-shadow: 0 0 14px var(--teal-glow);
+}
+
+.neon-glow-danger {
+  box-shadow: 0 0 16px rgba(255, 95, 86, 0.45);
+  animation: alert-flash 1.2s infinite alternate;
+}
+
+@keyframes alert-flash {
+  from { box-shadow: 0 0 8px rgba(255, 95, 86, 0.3); }
+  to { box-shadow: 0 0 22px rgba(255, 95, 86, 0.8); }
+}
+
+/* Smooth Scroll Reveal Animations */
+.reveal-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+
+.reveal-on-scroll.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 3D Card Hover Tilt */
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.15s ease-out, box-shadow 0.2s ease;
+}

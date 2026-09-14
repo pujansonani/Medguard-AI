@@ -1,0 +1,201 @@
+# ==============================================================================
+# MEDGUARD AI: Feature Definitions, Normal Ranges & Imputation Strategy
+# ==============================================================================
+
+# Demographics & Static Features
+static_features:
+  - name: "age"
+    type: "numerical"
+    min_val: 18.0
+    max_val: 100.0
+    impute_strategy: "median"
+    default_val: 62.0
+
+  - name: "gender"
+    type: "categorical"
+    categories: ["M", "F"]
+    default_val: "M"
+
+  - name: "icu_type"
+    type: "categorical"
+    categories: ["MICU", "SICU", "CCU", "CVICU", "TSICU", "Neuro ICU"]
+    default_val: "MICU"
+
+  - name: "admission_type"
+    type: "categorical"
+    categories: ["EMERGENCY", "URGENT", "ELECTIVE", "OBSERVATION"]
+    default_val: "EMERGENCY"
+
+# Physiological Vital Signs (Hourly Time-Series)
+vital_signs:
+  - name: "heart_rate"
+    itemid_aliases: [220045]
+    unit: "bpm"
+    normal_low: 60.0
+    normal_high: 100.0
+    clip_min: 20.0
+    clip_max: 240.0
+    default_val: 80.0
+
+  - name: "sbp" # Systolic Blood Pressure
+    itemid_aliases: [220179, 220050]
+    unit: "mmHg"
+    normal_low: 90.0
+    normal_high: 140.0
+    clip_min: 40.0
+    clip_max: 280.0
+    default_val: 120.0
+
+  - name: "dbp" # Diastolic Blood Pressure
+    itemid_aliases: [220180, 220051]
+    unit: "mmHg"
+    normal_low: 60.0
+    normal_high: 90.0
+    clip_min: 20.0
+    clip_max: 180.0
+    default_val: 75.0
+
+  - name: "map" # Mean Arterial Pressure
+    itemid_aliases: [220052, 220181, 225312]
+    unit: "mmHg"
+    normal_low: 65.0
+    normal_high: 105.0
+    clip_min: 30.0
+    clip_max: 200.0
+    default_val: 85.0
+
+  - name: "resp_rate" # Respiratory Rate
+    itemid_aliases: [220210, 224690]
+    unit: "breaths/min"
+    normal_low: 12.0
+    normal_high: 20.0
+    clip_min: 4.0
+    clip_max: 60.0
+    default_val: 16.0
+
+  - name: "temperature" # Body Temperature (°C)
+    itemid_aliases: [223761, 223762]
+    unit: "celsius"
+    normal_low: 36.5
+    normal_high: 37.5
+    clip_min: 30.0
+    clip_max: 43.0
+    default_val: 37.0
+
+  - name: "spo2" # Oxygen Saturation (%)
+    itemid_aliases: [220277]
+    unit: "%"
+    normal_low: 95.0
+    normal_high: 100.0
+    clip_min: 50.0
+    clip_max: 100.0
+    default_val: 98.0
+
+  - name: "gcs" # Glasgow Coma Scale (Total)
+    itemid_aliases: [220739, 223900, 223901]
+    unit: "points"
+    normal_low: 14.0
+    normal_high: 15.0
+    clip_min: 3.0
+    clip_max: 15.0
+    default_val: 15.0
+
+# Laboratory Biomarkers (Resampled Hourly / Forward Filled)
+laboratory_tests:
+  - name: "glucose"
+    itemid_aliases: [50931, 50809, 225664]
+    unit: "mg/dL"
+    normal_low: 70.0
+    normal_high: 140.0
+    clip_min: 20.0
+    clip_max: 800.0
+    default_val: 100.0
+
+  - name: "creatinine"
+    itemid_aliases: [50912]
+    unit: "mg/dL"
+    normal_low: 0.6
+    normal_high: 1.2
+    clip_min: 0.1
+    clip_max: 20.0
+    default_val: 0.9
+
+  - name: "hemoglobin"
+    itemid_aliases: [51222, 50811]
+    unit: "g/dL"
+    normal_low: 12.0
+    normal_high: 17.0
+    clip_min: 3.0
+    clip_max: 25.0
+    default_val: 13.5
+
+  - name: "wbc" # White Blood Cell Count
+    itemid_aliases: [51301, 51300]
+    unit: "K/uL"
+    normal_low: 4.0
+    normal_high: 11.0
+    clip_min: 0.5
+    clip_max: 80.0
+    default_val: 7.5
+
+  - name: "platelets"
+    itemid_aliases: [51265]
+    unit: "K/uL"
+    normal_low: 150.0
+    normal_high: 400.0
+    clip_min: 5.0
+    clip_max: 1000.0
+    default_val: 220.0
+
+  - name: "sodium"
+    itemid_aliases: [50983, 50824]
+    unit: "mEq/L"
+    normal_low: 135.0
+    normal_high: 145.0
+    clip_min: 100.0
+    clip_max: 180.0
+    default_val: 140.0
+
+  - name: "potassium"
+    itemid_aliases: [50971, 50822]
+    unit: "mEq/L"
+    normal_low: 3.5
+    normal_high: 5.0
+    clip_min: 1.5
+    clip_max: 9.0
+    default_val: 4.0
+
+  - name: "bicarbonate"
+    itemid_aliases: [50882, 50803]
+    unit: "mEq/L"
+    normal_low: 22.0
+    normal_high: 29.0
+    clip_min: 5.0
+    clip_max: 50.0
+    default_val: 24.0
+
+  - name: "lactate"
+    itemid_aliases: [50813]
+    unit: "mmol/L"
+    normal_low: 0.5
+    normal_high: 2.0
+    clip_min: 0.2
+    clip_max: 25.0
+    default_val: 1.2
+
+  - name: "bun" # Blood Urea Nitrogen
+    itemid_aliases: [51006]
+    unit: "mg/dL"
+    normal_low: 7.0
+    normal_high: 20.0
+    clip_min: 2.0
+    clip_max: 150.0
+    default_val: 15.0
+
+# Clinical Note Configuration
+clinical_notes:
+  note_types: ["Nursing", "Physician", "Progress Notes", "Radiology", "Consultation"]
+  max_sequence_length: 512
+  chunk_size: 256
+  chunk_overlap: 32
+  aggregation: "mean_pooling"

@@ -1,0 +1,66 @@
+# ==============================================================================
+# MEDGUARD AI: Global Experiment Configuration
+# ==============================================================================
+
+project_name: "medguard-ai"
+version: "0.1.0"
+mode: "DEMO" # "DEMO" or "MIMIC"
+seed: 42
+device: "cpu" # "cpu", "cuda", or "mps"
+
+# Cohort & Prediction Horizon Configuration
+cohort:
+  min_age: 18
+  min_icu_los_hours: 24.0 # ICU length of stay must be >= 24h
+  observation_window_hours: 24.0 # Only data from first 24h of ICU stay
+  prediction_horizon_hours: 48.0 # Predict mortality within 48h after observation window
+  multi_horizons_hours: [6.0, 12.0, 24.0, 48.0]
+  time_step_hours: 1.0 # 1-hour temporal bins (sequence length = 24)
+  exclude_discharge_summaries: true # Strict prevention of retrospective note leakage
+
+# Splitting Configuration (Strictly Patient-Level to prevent leakage)
+splitting:
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  stratify_col: "mortality_48h"
+
+# Synthetic Data Generation Parameters (High-fidelity DEMO cohort)
+synthetic:
+  num_patients: 600
+  base_mortality_rate: 0.18
+  missingness_rate: 0.12
+  note_frequency_mean: 3.5 # average number of notes per 24h stay
+
+# Paths
+paths:
+  raw_mimic_dir: "data/raw/mimic-iv-2.2"
+  raw_notes_dir: "data/raw/mimic-iv-note-2.2"
+  processed_dir: "data/processed"
+  synthetic_dir: "data/synthetic"
+  checkpoints_dir: "models/checkpoints"
+  experiments_dir: "experiments/artifacts"
+  reports_dir: "reports/generated"
+
+# Training Configuration
+training:
+  batch_size: 32
+  epochs: 25
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  early_stopping_patience: 6
+  gradient_clip_val: 1.0
+  pos_weight: 3.5 # Handling class imbalance in BCEWithLogitsLoss
+  num_mc_samples: 30 # Monte Carlo dropout samples for epistemic uncertainty
+
+# Evaluation Configuration
+evaluation:
+  bootstrap_iterations: 200
+  confidence_level: 0.95
+  calibration_n_bins: 10
+  fairness_subgroups:
+    - "age_group"
+    - "gender"
+    - "icu_type"
+  robustness_missingness_levels: [0.0, 0.1, 0.2, 0.3, 0.5]
+  robustness_noise_stds: [0.0, 0.05, 0.1, 0.2]
