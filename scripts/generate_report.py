@@ -289,6 +289,10 @@ def main():
     rep_dir = root / cfg.get("paths", {}).get("reports_dir", "reports/generated")
     output_file = rep_dir / "research_evaluation_report.md"
     generate_markdown_report(eval_data, output_file)
+    
+    # Also save to reports/final_results.md as standard
+    final_res_file = root / "reports" / "final_results.md"
+    generate_markdown_report(eval_data, final_res_file)
 
     # Generate publication figures and CSV tables
     figures_dir = root / "reports" / "figures"

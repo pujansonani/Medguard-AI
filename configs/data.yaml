@@ -1,0 +1,101 @@
+# ==============================================================================
+# MEDGUARD AI: MIMIC-IV Data Paths & Schema Mapping Configuration
+# ==============================================================================
+
+data:
+  # Base Paths (Can be overridden via environment variables or CLI flags)
+  mimic_iv_path: "./data/raw/mimiciv"
+  mimic_iv_note_path: "./data/raw/mimiciv_note"
+  synthetic_path: "./data/synthetic"
+  processed_path: "./data/processed"
+  interim_path: "./data/interim"
+  cache_path: "./data/cache"
+  splits_path: "./data/processed/splits"
+
+# Table Names & Subdirectory Structure in MIMIC-IV v2.2
+tables:
+  hosp:
+    patients: "patients" # hosp/patients.csv[.gz]
+    admissions: "admissions" # hosp/admissions.csv[.gz]
+    labevents: "labevents" # hosp/labevents.csv[.gz]
+    d_labitems: "d_labitems" # hosp/d_labitems.csv[.gz]
+  icu:
+    icustays: "icustays" # icu/icustays.csv[.gz]
+    chartevents: "chartevents" # icu/chartevents.csv[.gz]
+    d_items: "d_items" # icu/d_items.csv[.gz]
+  notes:
+    radiology: "radiology" # note/radiology.csv[.gz]
+    discharge: "discharge" # note/discharge.csv[.gz]
+
+# MIMIC-IV ItemID Mappings to Standard Physiological Concepts
+item_id_map:
+  # Vital Signs (chartevents)
+  heart_rate: [220045]
+  sbp: [220179, 220050] # Non-invasive and arterial systolic
+  dbp: [220180, 220051] # Non-invasive and arterial diastolic
+  map: [220181, 220052, 225312] # Mean arterial pressure
+  resp_rate: [220210, 224690] # Respiratory rate
+  temperature: [223761, 223762] # Fahrenheit and Celsius
+  spo2: [220277] # Pulse oximetry
+  gcs: [220739, 223900, 223901] # GCS Eye, Motor, Verbal components
+  glucose_vital: [220621, 225664] # Bedside fingerstick glucose
+
+  # Laboratory Biomarkers (labevents)
+  glucose_lab: [50931, 50809]
+  creatinine: [50912]
+  bun: [51006]
+  sodium: [50983, 50824]
+  potassium: [50971, 50822]
+  chloride: [50902, 50806]
+  bicarbonate: [50882, 50803]
+  hemoglobin: [51222, 50811]
+  wbc: [51301, 51300]
+  platelets: [51265]
+  lactate: [50813]
+
+# Concept Schema Column Names
+schema_columns:
+  patients:
+    patient_id: "subject_id"
+    gender: "gender"
+    anchor_age: "anchor_age"
+    anchor_year: "anchor_year"
+    dod: "dod"
+  admissions:
+    patient_id: "subject_id"
+    admission_id: "hadm_id"
+    admittime: "admittime"
+    dischtime: "dischtime"
+    deathtime: "deathtime"
+    admission_type: "admission_type"
+    hospital_expire_flag: "hospital_expire_flag"
+  icustays:
+    patient_id: "subject_id"
+    admission_id: "hadm_id"
+    stay_id: "stay_id"
+    first_careunit: "first_careunit"
+    intime: "intime"
+    outtime: "outtime"
+    los: "los"
+  chartevents:
+    patient_id: "subject_id"
+    stay_id: "stay_id"
+    charttime: "charttime"
+    itemid: "itemid"
+    valuenum: "valuenum"
+    valueuom: "valueuom"
+  labevents:
+    patient_id: "subject_id"
+    hadm_id: "hadm_id"
+    charttime: "charttime"
+    itemid: "itemid"
+    valuenum: "valuenum"
+    valueuom: "valueuom"
+  notes:
+    patient_id: "subject_id"
+    hadm_id: "hadm_id"
+    note_id: "note_id"
+    charttime: "charttime"
+    note_type: "note_type"
+    note_seq: "note_seq"
+    text: "text"

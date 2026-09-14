@@ -1,0 +1,17 @@
+{
+  "initial_icu_stays": 600,
+  "final_cohort_stays": 600,
+  "mortality_count": 151,
+  "survival_count": 449,
+  "mortality_rate": 0.2517,
+  "age_mean": 64.49,
+  "age_std": 13.51,
+  "icu_type_distribution": {
+    "MICU": 223,
+    "SICU": 116,
+    "CVICU": 85,
+    "CCU": 77,
+    "TSICU": 60,
+    "Neuro ICU": 39
+  }
+}

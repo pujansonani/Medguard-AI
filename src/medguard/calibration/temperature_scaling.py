@@ -51,6 +51,17 @@ class TemperatureScaler:
         scaled_logits = logits / self.temperature
         return 1.0 / (1.0 + np.exp(-scaled_logits))
 
+    def save(self, path: str) -> None:
+        """Save fitted scaler to disk."""
+        import joblib
+        joblib.dump(self, str(path))
+
+    @classmethod
+    def load(cls, path: str) -> "TemperatureScaler":
+        """Load fitted scaler from disk."""
+        import joblib
+        return joblib.load(str(path))
+
 
 def compute_ece(probs: np.ndarray, y_true: np.ndarray, n_bins: int = 10) -> float:
     """

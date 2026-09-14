@@ -118,8 +118,12 @@ def load_all_artifacts():
 
 
 # Sidebar Navigation & System Status
-st.sidebar.markdown("## 🛡️ **MEDGUARD AI**")
-st.sidebar.caption("Multimodal ICU Early Warning Platform")
+logo_path = root_dir / "app" / "static" / "logo.png"
+if logo_path.exists():
+    st.sidebar.image(str(logo_path), use_container_width=True)
+else:
+    st.sidebar.markdown("## 🛡️ **MEDGUARD AI**")
+    st.sidebar.caption("Multimodal ICU Early Warning Platform")
 
 st.sidebar.markdown(
     """

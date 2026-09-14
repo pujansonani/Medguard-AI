@@ -233,6 +233,10 @@ class ClinicalNLPModel(TextModel):
             _, embs, _ = self.net(input_ids, attention_mask)
             return embs.cpu().numpy()
 
+    def encode_texts(self, texts: List[str]) -> np.ndarray:
+        """Alias for get_embeddings."""
+        return self.get_embeddings(texts)
+
     def get_token_attributions(self, text: str) -> List[Tuple[str, float]]:
         """Return token-level importance weights for explainability."""
         self.net.eval()

@@ -1,4 +1,8 @@
-# MEDGUARD AI: Multimodal Explainable Early Warning System for ICU Deterioration
+<div align="center">
+  <img src="docs/images/logo.png" alt="MEDGUARD AI Logo" width="220" />
+  <h1>MEDGUARD AI</h1>
+  <p><strong>Multimodal Explainable Early Warning System for ICU Deterioration</strong></p>
+  <p><em>Predict • Prevent • Protect</em></p>
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%20%7C%203.11-brightgreen.svg)](https://python.org)
@@ -6,6 +10,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109%2B-009688.svg)](https://fastapi.tiangolo.com)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.31%2B-ff4b4b.svg)](https://streamlit.io)
 [![Tests](https://img.shields.io/badge/Tests-21%2F21%20Passed-brightgreen.svg)](tests/)
+</div>
 
 > **CRITICAL MEDICAL DISCLAIMER: ACADEMIC RESEARCH PROTOTYPE ONLY**
 > MEDGUARD AI is an academic machine learning research system developed strictly for experimental evaluation and scientific reproducibility. **It is NOT a certified medical device and must NEVER be used for clinical diagnosis, patient triage, treatment recommendations, or real-time clinical decision-making.**

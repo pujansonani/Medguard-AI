@@ -36,11 +36,18 @@ wheels/
 *.swp
 *.swo
 
-# Project Data & Models (MIMIC-IV raw data must NEVER be committed)
+# Project Data & Models (MIMIC-IV raw and cached embeddings must NEVER be committed)
 data/raw/*
 !data/raw/.gitkeep
 data/interim/*
 !data/interim/.gitkeep
+data/cache/*
+!data/cache/.gitkeep
+data/processed/*.csv
+data/processed/*.parquet
+data/processed/*.npy
+data/processed/*.json
+!data/processed/.gitkeep
 experiments/mlruns/
 
 
