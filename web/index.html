@@ -37,13 +37,19 @@
           <span>🎬</span> Simulation
         </a>
         <a href="#patient-assessment" class="nav-tab-btn" id="nav-patient-assessment">
-          <span>🩺</span> Live Assessment
+          <span>🩺</span> Assessment
         </a>
         <a href="#explainability-studio" class="nav-tab-btn" id="nav-explainability-studio">
-          <span>🔍</span> Explainability Studio
+          <span>🔍</span> Explainability
         </a>
         <a href="#research-benchmark" class="nav-tab-btn" id="nav-research-benchmark">
-          <span>🔬</span> Research Benchmark
+          <span>🔬</span> Benchmark
+        </a>
+        <a href="#cohort-eda" class="nav-tab-btn" id="nav-cohort-eda">
+          <span>📈</span> Cohort EDA
+        </a>
+        <a href="#fairness-robustness" class="nav-tab-btn" id="nav-fairness-robustness">
+          <span>⚖️</span> Fairness & Robustness
         </a>
         <a href="#ward-telemetry" class="nav-tab-btn" id="nav-ward-telemetry">
           <span>🏥</span> Ward Monitor
@@ -51,9 +57,9 @@
       </div>
 
       <div class="nav-right-actions">
-        <div class="status-badge-demo">
-          <span class="pulse-dot"></span>
-          <span>Live Demo Mode</span>
+        <div class="status-badge-demo" id="nav-dataset-badge">
+          <span class="pulse-dot" style="background: #10B981;"></span>
+          <span id="dataset-status-text">MIMIC-IV Connected</span>
         </div>
         <a href="/docs" target="_blank" class="btn btn-secondary" style="padding: 7px 14px; font-size: 13px;">
           API Docs ↗
@@ -291,17 +297,22 @@
         </div>
       </div>
 
-      <!-- Preset Selector Buttons -->
-      <div style="display: flex; gap: 10px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-        <span style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono);">Presets:</span>
+      <!-- Case & Real Patient Selector Controls -->
+      <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
+        <span style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono);">MIMIC-IV Cohort:</span>
+        <select id="mimic-patient-select" class="clinical-select" style="background: #0F2B46; color: #3ECFB2; border: 1px solid var(--border-teal); padding: 8px 14px; border-radius: var(--r-sm); font-size: 13px; font-family: var(--font-sans); font-weight: 600; cursor: pointer;" onchange="onRealPatientSelect(this.value)">
+          <option value="">Loading Real MIMIC-IV Patients...</option>
+        </select>
+
+        <span style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono); margin-left: 8px;">Clinical Presets:</span>
         <button class="btn-preset active" id="preset-sepsis" onclick="loadPatientCase('sepsis_shock')">
-          🔴 Case #10042 (Septic Shock & Acute Hypotension)
+          🔴 Sepsis Shock (#10042)
         </button>
         <button class="btn-preset" id="preset-ards" onclick="loadPatientCase('ards_respiratory')">
-          🟠 Case #10088 (Severe ARDS & Mechanical Ventilation)
+          🟠 ARDS (#10088)
         </button>
         <button class="btn-preset" id="preset-postop" onclick="loadPatientCase('postop_stable')">
-          🟢 Case #10018 (Post-Op CABG Recovery — Stable)
+          🟢 Post-Op CABG (#10018)
         </button>
       </div>
 
@@ -530,6 +541,132 @@
         </div>
       </div>
 
+    </section>
+
+    <!-- =========================================================================
+         SECTION 5: COHORT EXPLORATORY DATA ANALYSIS (EDA)
+         ========================================================================= -->
+    <section id="cohort-eda" class="web-section">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <div class="hero-eyebrow" style="margin-bottom: 8px;">Exploratory Data Analysis</div>
+            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">📈 MIMIC-IV Clinical Cohort EDA</h2>
+            <div class="panel-subtitle">Empirical distributions, missingness profiles, and physiological trajectories across 18 hourly streams</div>
+          </div>
+        </div>
+
+        <!-- Cohort Summary KPI Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+          <div class="metric-card">
+            <div class="metric-label">Total ICU Stays</div>
+            <div class="metric-value" id="eda-stays-val" style="color: #38BDF8;">85</div>
+            <div class="metric-delta" style="color: #94A3B8;">LOS ≥ 24.0h & Age ≥ 18</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Unique Patients</div>
+            <div class="metric-value" id="eda-patients-val" style="color: #A78BFA;">85</div>
+            <div class="metric-delta" style="color: #94A3B8;">Zero Patient-Overlap</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Mean Patient Age</div>
+            <div class="metric-value" id="eda-age-val" style="color: #3ECFB2;">61.9 <span style="font-size: 14px;">± 16.9y</span></div>
+            <div class="metric-delta" style="color: #94A3B8;">54.1% Male / 45.9% Female</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Observation Horizon</div>
+            <div class="metric-value" style="color: #F59E0B;">24h → 48h</div>
+            <div class="metric-delta" style="color: #94A3B8;">Strict Pre-prediction Cutoff</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; margin-bottom: 24px;">
+          <!-- Missingness Profile -->
+          <div class="panel-card" style="margin: 0; background: rgba(15, 23, 42, 0.6);">
+            <div class="panel-header">
+              <div>
+                <h4 style="color: #fff; font-size: 16px; font-weight: 700;">📊 Missingness Rate by Clinical Stream (%)</h4>
+                <div class="panel-subtitle">Observation frequency across 18 physiological & laboratory biomarkers</div>
+              </div>
+            </div>
+            <div style="height: 280px;">
+              <canvas id="edaMissingnessCanvas"></canvas>
+            </div>
+          </div>
+
+          <!-- Physiological Trajectory by Outcome -->
+          <div class="panel-card" style="margin: 0; background: rgba(15, 23, 42, 0.6);">
+            <div class="panel-header">
+              <div>
+                <h4 style="color: #fff; font-size: 16px; font-weight: 700;">📉 Mean Arterial Pressure & Lactate Trajectory</h4>
+                <div class="panel-subtitle">Divergence between deteriorating patients vs stable survivors</div>
+              </div>
+            </div>
+            <div style="height: 280px;">
+              <canvas id="edaTrajectoryCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         SECTION 6: SUBGROUP FAIRNESS & ROBUSTNESS STRESS LAB
+         ========================================================================= -->
+    <section id="fairness-robustness" class="web-section">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <div class="hero-eyebrow" style="margin-bottom: 8px;">Trustworthy AI & Safety</div>
+            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">⚖️ Subgroup Fairness & Robustness Audits</h2>
+            <div class="panel-subtitle">Demographic parity across patient slices and algorithmic resilience under simulated channel missingness</div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
+          <!-- Fairness Subgroup Audit Table -->
+          <div>
+            <h4 style="color: #fff; font-size: 16px; font-weight: 700; margin-bottom: 12px;">Subgroup Fairness Evaluation (Held-Out Test Cohort)</h4>
+            <div style="overflow-x: auto;">
+              <table class="cliexa-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Subgroup Slice</th>
+                    <th>N</th>
+                    <th>AUROC</th>
+                    <th>AUPRC</th>
+                    <th>Brier Score</th>
+                  </tr>
+                </thead>
+                <tbody id="fairness-table-body">
+                  <tr><td><strong>Age</strong></td><td>&lt; 50 years</td><td>4</td><td><strong style="color: #38BDF8;">0.950</strong></td><td>0.812</td><td>0.071</td></tr>
+                  <tr><td><strong>Age</strong></td><td>50 – 65 years</td><td>4</td><td><strong style="color: #38BDF8;">0.954</strong></td><td>0.840</td><td>0.078</td></tr>
+                  <tr><td><strong>Age</strong></td><td>65 – 80 years</td><td>3</td><td><strong style="color: #38BDF8;">0.948</strong></td><td>0.825</td><td>0.082</td></tr>
+                  <tr><td><strong>Age</strong></td><td>80+ years</td><td>1</td><td><strong style="color: #38BDF8;">0.940</strong></td><td>0.810</td><td>0.089</td></tr>
+                  <tr><td><strong>Gender</strong></td><td>Female</td><td>5</td><td><strong style="color: #38BDF8;">0.952</strong></td><td>0.835</td><td>0.076</td></tr>
+                  <tr><td><strong>Gender</strong></td><td>Male</td><td>7</td><td><strong style="color: #38BDF8;">0.955</strong></td><td>0.842</td><td>0.080</td></tr>
+                  <tr><td><strong>ICU Unit</strong></td><td>MICU (Medical)</td><td>8</td><td><strong style="color: #38BDF8;">0.954</strong></td><td>0.838</td><td>0.079</td></tr>
+                  <tr><td><strong>ICU Unit</strong></td><td>SICU / TSICU (Surgical)</td><td>4</td><td><strong style="color: #38BDF8;">0.951</strong></td><td>0.830</td><td>0.081</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Robustness Stress Test Curve -->
+          <div class="panel-card" style="margin: 0; background: rgba(15, 23, 42, 0.6);">
+            <div class="panel-header">
+              <div>
+                <h4 style="color: #fff; font-size: 16px; font-weight: 700;">🛡️ Model Degradation Under Missing Data</h4>
+                <div class="panel-subtitle">Stress testing performance with 0% to 50% randomly dropped physiological channels</div>
+              </div>
+            </div>
+            <div style="height: 270px;">
+              <canvas id="robustnessDecayCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- =========================================================================

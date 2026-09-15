@@ -4,6 +4,7 @@ Provides RESTful inference, explainability, multi-horizon risk trajectories, and
 """
 
 from contextlib import asynccontextmanager
+import json
 from pathlib import Path
 from typing import Any, Dict, List
 import numpy as np
@@ -164,6 +165,77 @@ async def get_experiment_metrics():
     if not model_service.evaluation_results:
         return {"status": "Evaluation results not yet generated."}
     return _sanitize_floats(model_service.evaluation_results)
+
+
+@app.get("/patients", tags=["Clinical Data"])
+async def get_test_patients():
+    """Return test cohort patients with their full 24h physiological series, notes, and metadata."""
+    proc_dir = root_dir / "data" / "processed"
+    pts_file = proc_dir / "patients_test.parquet"
+    if not pts_file.exists():
+        return {"patients": []}
+    
+    df_pts = pd.read_parquet(pts_file)
+    X_test = np.load(proc_dir / "X_test.npy") if (proc_dir / "X_test.npy").exists() else None
+    mask_test = np.load(proc_dir / "mask_test.npy") if (proc_dir / "mask_test.npy").exists() else None
+    y_test = np.load(proc_dir / "y_test.npy") if (proc_dir / "y_test.npy").exists() else None
+    
+    texts_file = proc_dir / "texts_test.json"
+    texts_dict = {}
+    if texts_file.exists():
+        with open(texts_file, "r") as f:
+            texts_list = json.load(f)
+            texts_dict = {i: texts_list[i] for i in range(len(texts_list))}
+
+    patients = []
+    for idx, row in df_pts.iterrows():
+        timeseries = []
+        if X_test is not None and idx < len(X_test):
+            for h in range(24):
+                obs = {"hour": h}
+                for f_i, col in enumerate(FEATURE_COLUMNS):
+                    if mask_test is not None and mask_test[idx, h, f_i] == 1.0:
+                        obs[col] = float(X_test[idx, h, f_i])
+                    else:
+                        obs[col] = None
+                timeseries.append(obs)
+
+        true_mort = int(row.get("mortality_48h", 0))
+        if y_test is not None and idx < len(y_test):
+            true_mort = int(y_test[idx, 3] if y_test.ndim > 1 else y_test[idx])
+
+        patients.append({
+            "index": idx,
+            "subject_id": int(row.get("subject_id", 10000 + idx)),
+            "stay_id": int(row.get("stay_id", 30000 + idx)),
+            "age": float(row.get("age", 65.0)),
+            "gender": str(row.get("gender", "M")),
+            "icu_type": str(row.get("icu_type", "MICU")),
+            "admission_type": str(row.get("admission_type", "EMERGENCY")),
+            "mortality_48h": true_mort,
+            "clinical_notes": texts_dict.get(idx, "No clinical notes documented."),
+            "timeseries": timeseries,
+        })
+
+    return {"patients": patients, "total": len(patients)}
+
+
+@app.get("/eda/summary", tags=["Research"])
+async def get_eda_summary():
+    """Return cohort overview, class balance, and missingness profiles."""
+    rep_dir = root_dir / "reports"
+    cohort_json = rep_dir / "cohort_report.json"
+    eda_csv = rep_dir / "tables" / "eda_summary.csv"
+    
+    res = {"cohort_report": {}, "eda_summary": {}}
+    if cohort_json.exists():
+        with open(cohort_json, "r") as f:
+            res["cohort_report"] = json.load(f)
+    if eda_csv.exists():
+        df_eda = pd.read_csv(eda_csv)
+        res["eda_summary"] = df_eda.to_dict(orient="records")
+        
+    return res
 
 
 @app.post("/predict", response_model=PredictionResponse, tags=["Inference"])
