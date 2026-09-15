@@ -39,6 +39,18 @@
         <a href="#patient-assessment" class="nav-tab-btn" id="nav-patient-assessment">
           <span>🩺</span> Assessment
         </a>
+        <a href="#organ-dysfunction" class="nav-tab-btn" id="nav-organ-dysfunction">
+          <span>🫀</span> Digital Twin
+        </a>
+        <a href="#bedside-copilot" class="nav-tab-btn" id="nav-bedside-copilot">
+          <span>🤖</span> AI Copilot
+        </a>
+        <a href="#counterfactual-simulator" class="nav-tab-btn" id="nav-counterfactual-simulator">
+          <span>💊</span> What-If
+        </a>
+        <a href="#icu-calculators" class="nav-tab-btn" id="nav-icu-calculators">
+          <span>🧮</span> Calculators
+        </a>
         <a href="#explainability-studio" class="nav-tab-btn" id="nav-explainability-studio">
           <span>🔍</span> Explainability
         </a>
@@ -49,10 +61,10 @@
           <span>📈</span> Cohort EDA
         </a>
         <a href="#fairness-robustness" class="nav-tab-btn" id="nav-fairness-robustness">
-          <span>⚖️</span> Fairness & Robustness
+          <span>⚖️</span> Fairness
         </a>
         <a href="#ward-telemetry" class="nav-tab-btn" id="nav-ward-telemetry">
-          <span>🏥</span> Ward Monitor
+          <span>🏥</span> Ward
         </a>
       </div>
 
@@ -435,26 +447,486 @@
         <div style="height: 250px;">
           <canvas id="vitalsTrajectoryCanvas"></canvas>
         </div>
-      </div>
-
-      <!-- Notes Entry -->
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <h3 class="panel-title">📝 Contemporaneous Clinical Documentation</h3>
-            <div class="panel-subtitle">Notes documented strictly within 24-hour observation window (No discharge summaries)</div>
-          </div>
+        <div style="display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap;">
+          <button class="btn btn-secondary" style="border-color: #38BDF8; color: #38BDF8;" onclick="playSbarBriefing()">
+            <span id="sbar-btn-icon">🎙️</span> Read Multimodal SBAR Audio Briefing
+          </button>
+          <button class="btn btn-secondary" onclick="exportClinicalDossier()">
+            📄 Export Clinical Research Dossier
+          </button>
           <button class="btn btn-primary" onclick="analyzePatientRecord()">
             ⚡ Re-Analyze Patient Record
           </button>
         </div>
-        <textarea id="pt-notes-input" class="clinical-note-textarea"></textarea>
+      </div>
+
+      <!-- SBAR Audio Briefing Card -->
+      <div id="sbar-briefing-card" class="panel-card" style="display: none; background: rgba(15, 43, 70, 0.9); border: 1px solid #38BDF8;">
+        <div class="panel-header">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="pulse-dot" style="background: #38BDF8;"></span>
+              <h4 style="color: #38BDF8; font-size: 16px; font-weight: 700;">🎙️ Autonomous SBAR Clinical Audio Briefing</h4>
+            </div>
+            <div class="panel-subtitle">Physician-grade situation handoff synthesized with voice audio copilot</div>
+          </div>
+          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="stopSbarAudio()">⏹ Stop Audio</button>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 10px;">
+          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; border-left: 3px solid #38BDF8;">
+            <div style="font-size: 11px; font-weight: 800; color: #38BDF8; text-transform: uppercase;">Situation</div>
+            <div id="sbar-situation-text" style="font-size: 13px; color: #E2E8F0; margin-top: 4px; line-height: 1.5;">-</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; border-left: 3px solid #A78BFA;">
+            <div style="font-size: 11px; font-weight: 800; color: #A78BFA; text-transform: uppercase;">Background</div>
+            <div id="sbar-background-text" style="font-size: 13px; color: #E2E8F0; margin-top: 4px; line-height: 1.5;">-</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; border-left: 3px solid #F59E0B;">
+            <div style="font-size: 11px; font-weight: 800; color: #F59E0B; text-transform: uppercase;">Assessment</div>
+            <div id="sbar-assessment-text" style="font-size: 13px; color: #E2E8F0; margin-top: 4px; line-height: 1.5;">-</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; border-left: 3px solid #10B981;">
+            <div style="font-size: 11px; font-weight: 800; color: #10B981; text-transform: uppercase;">Recommendation</div>
+            <div id="sbar-recommendation-text" style="font-size: 13px; color: #E2E8F0; margin-top: 4px; line-height: 1.5;">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes Entry with Voice Dictation & BioBERT NER Extractor -->
+      <div class="panel-card">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
+          <div>
+            <h3 class="panel-title">📝 Contemporaneous Clinical Documentation</h3>
+            <div class="panel-subtitle">Notes documented strictly within 24-hour observation window (No discharge summaries)</div>
+          </div>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button id="voice-dictate-btn" class="btn btn-secondary" style="border-color: #EF4444; color: #F87171;" onclick="toggleVoiceDictation()">
+              <span id="voice-mic-icon">🎤</span> Dictate Note (Live Speech)
+            </button>
+            <button class="btn btn-secondary" style="border-color: #A78BFA; color: #A78BFA;" onclick="extractBioBertEntities()">
+              <span>🔍</span> Extract BioBERT Entities
+            </button>
+            <button class="btn btn-primary" style="padding: 7px 16px; font-size: 13px;" onclick="rescoreWithCurrentNotes()">
+              <span>⚡</span> Re-Score Multimodal Risk
+            </button>
+          </div>
+        </div>
+        <textarea id="pt-notes-input" class="clinical-note-textarea" placeholder="Enter clinical notes or use voice dictation..."></textarea>
+        
+        <!-- Live BioBERT Entities Display Cloud -->
+        <div id="biobert-entities-cloud" style="display: none; margin-top: 14px; padding: 14px; background: rgba(7, 14, 26, 0.85); border: 1px solid var(--border-teal); border-radius: var(--r-sm);">
+          <div style="font-size: 12px; font-weight: 700; color: var(--teal); margin-bottom: 8px; text-transform: uppercase; font-family: var(--font-mono);">
+            BioBERT Named Entities Recognized:
+          </div>
+          <div id="ner-chips-container" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+        </div>
       </div>
 
     </section>
 
     <!-- =========================================================================
-         SECTION 3: MULTIMODAL EXPLAINABILITY STUDIO
+         NOVELTY SECTION: DIGITAL TWIN MULTI-ORGAN DYSFUNCTION VISUALIZER
+         ========================================================================= -->
+    <section id="organ-dysfunction" class="web-section">
+      <div class="panel-card">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
+          <div>
+            <div class="hero-eyebrow" style="margin-bottom: 8px;">Physiological Digital Twin</div>
+            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🫀 Digital Twin Organ Dysfunction Visualizer</h2>
+            <div class="panel-subtitle">
+              Continuous multi-system physiological mapping across 6 critical organ domains with clinical guideline targets
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <div style="text-align: right;">
+              <div style="font-size: 11px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase;">Overall Organ Stress:</div>
+              <strong id="digital-twin-overall-stress" style="font-size: 24px; color: #EF4444; font-family: var(--font-mono);">68.5%</strong>
+            </div>
+            <button class="btn btn-secondary" onclick="refreshDigitalTwinData()">
+              🔄 Refresh Digital Twin
+            </button>
+          </div>
+        </div>
+
+        <!-- 6-Organ Systems Grid -->
+        <div id="organ-twin-container" class="organ-twin-grid">
+          <!-- Populated by JS -->
+        </div>
+
+        <!-- Clinical Pearls Banner -->
+        <div style="margin-top: 20px; padding: 16px 20px; background: rgba(15, 43, 70, 0.6); border-left: 4px solid var(--teal); border-radius: var(--r-sm);">
+          <div style="font-size: 12px; font-weight: 800; color: var(--teal); text-transform: uppercase; margin-bottom: 4px;">Organ Cascade Pearl:</div>
+          <div id="organ-twin-pearls-text" style="font-size: 13px; color: #E2E8F0; line-height: 1.6;">
+            Cardiovascular stress is elevated due to low Mean Arterial Pressure. Early vasopressor support prevents renal medullary hypoxia and ischemic tubular injury.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         NOVELTY SECTION: AUTONOMOUS BEDSIDE AI COPILOT & CLINICAL ROUNDING AGENT
+         ========================================================================= -->
+    <section id="bedside-copilot" class="web-section">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <div class="hero-eyebrow" style="margin-bottom: 8px;">Autonomous Bedside Agent</div>
+            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🤖 Bedside AI Clinical Copilot & Rounding Assistant</h2>
+            <div class="panel-subtitle">
+              Physician-grade interactive dialogue agent powered by multimodal context, guideline citations, and automated order drafting
+            </div>
+          </div>
+        </div>
+
+        <div class="copilot-chat-container">
+          <!-- Chat Messages Scrollable Area -->
+          <div id="copilot-messages-area" class="copilot-messages">
+            <div class="copilot-bubble bot">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <span class="pulse-dot" style="background: var(--teal);"></span>
+                <strong style="color: var(--teal); font-size: 13px;">MEDGUARD Clinical Copilot</strong>
+                <span style="font-size: 11px; color: var(--muted); font-family: var(--font-mono);">Evidence-Based Decision Support</span>
+              </div>
+              <p style="margin: 0; color: #E2E8F0;">
+                Hello Doctor. I am actively monitoring <strong>Patient #10042</strong>. Their calibrated 48-hour deterioration probability is <strong>84.2% (Critical High Risk)</strong> with SOFA score of 14. How can I assist during bedside rounds?
+              </p>
+            </div>
+          </div>
+
+          <!-- Quick Action Prompts Bar -->
+          <div class="copilot-chips-bar">
+            <button class="prompt-chip" onclick="sendCopilotPreset('Draft Sepsis-3 1-Hour Resuscitation Order Set')">
+              📋 Sepsis-3 Order Set
+            </button>
+            <button class="prompt-chip" onclick="sendCopilotPreset('Evaluate Vasopressor & Inotrope Escalation Strategy')">
+              ⚡ Vasopressor Titration
+            </button>
+            <button class="prompt-chip" onclick="sendCopilotPreset('Generate KDIGO Renal Failure Action Plan')">
+              🫘 KDIGO Renal Plan
+            </button>
+            <button class="prompt-chip" onclick="sendCopilotPreset('Explain Cross-Modal Discrepancy between text notes and telemetry')">
+              🧠 Cross-Modal NLP Analysis
+            </button>
+            <button class="prompt-chip" onclick="sendCopilotPreset('Generate 24h Attending Rounds Summary')">
+              📝 Attending Handoff
+            </button>
+          </div>
+
+          <!-- Input Bar -->
+          <div class="copilot-input-bar">
+            <input type="text" id="copilot-user-input" class="copilot-input" placeholder="Ask about patient vitals, medications, clinical guidelines..." onkeydown="if(event.key==='Enter') sendCopilotMessage()">
+            <button class="btn btn-secondary" style="border-color: #38BDF8; color: #38BDF8; padding: 0 16px;" onclick="dictateCopilotQuestion()">
+              🎤 Ask
+            </button>
+            <button class="btn btn-primary" style="padding: 0 22px;" onclick="sendCopilotMessage()">
+              Send ➔
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         SECTION 3: WHAT-IF COUNTERFACTUAL INTERVENTION SIMULATOR
+         ========================================================================= -->
+    <section id="counterfactual-simulator" class="web-section">
+      <div class="panel-card">
+        <div class="panel-header">
+          <div>
+            <div class="hero-eyebrow" style="margin-bottom: 8px;">Therapeutic Simulator</div>
+            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">💊 What-If Counterfactual Intervention Studio</h2>
+            <div class="panel-subtitle">
+              Simulate clinical therapeutics (vasopressor titration, fluid clearance, oxygenation) and project counterfactual risk reduction in real time
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 24px;">
+          <!-- Therapeutic Levers Sliders -->
+          <div>
+            <h4 style="color: #fff; font-size: 16px; font-weight: 700; margin-bottom: 14px;">Therapeutic Levers & Interventions:</h4>
+            
+            <div class="slider-grid" style="grid-template-columns: 1fr; gap: 14px;">
+              <div class="slider-item">
+                <div class="slider-header">
+                  <span>💉 Titrate Norepinephrine (Δ MAP)</span>
+                  <strong id="cf-map-val" style="color: #38BDF8;">+15 mmHg</strong>
+                </div>
+                <input type="range" min="0" max="30" value="15" class="vital-range-slider" id="cf-slider-map" oninput="onCounterfactualSliderChange()">
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-header">
+                  <span>💧 Fluid Resuscitation & Clearance (Δ Lactate)</span>
+                  <strong id="cf-lactate-val" style="color: #3ECFB2;">-1.5 mmol/L</strong>
+                </div>
+                <input type="range" min="-3.0" max="0.0" step="0.1" value="-1.5" class="vital-range-slider" id="cf-slider-lactate" oninput="onCounterfactualSliderChange()">
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-header">
+                  <span>🫁 High-Flow Oxygen / PEEP (Δ SpO2)</span>
+                  <strong id="cf-spo2-val" style="color: #A78BFA;">+4%</strong>
+                </div>
+                <input type="range" min="0" max="10" value="4" class="vital-range-slider" id="cf-slider-spo2" oninput="onCounterfactualSliderChange()">
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-header">
+                  <span>❤️ Rate Control / Sedation (Δ Heart Rate)</span>
+                  <strong id="cf-hr-val" style="color: #F59E0B;">-15 bpm</strong>
+                </div>
+                <input type="range" min="-30" max="0" value="-15" class="vital-range-slider" id="cf-slider-hr" oninput="onCounterfactualSliderChange()">
+              </div>
+            </div>
+
+            <!-- Estimated Risk Reduction Badge -->
+            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid #10B981; padding: 16px; border-radius: var(--r-sm); margin-top: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-size: 11px; font-weight: 800; color: #10B981; text-transform: uppercase;">Projected Mortality Risk Reduction:</div>
+                  <div id="cf-risk-delta-text" style="font-size: 22px; font-weight: 800; color: #fff; font-family: var(--font-mono); margin-top: 2px;">
+                    -14.8% Absolute (35.2% Rel.)
+                  </div>
+                </div>
+                <div id="cf-status-badge" class="risk-level-badge badge-low" style="margin: 0; padding: 6px 12px;">
+                  Deterioration Arrested
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Counterfactual Trajectory Comparison Chart -->
+          <div class="panel-card" style="margin: 0; background: rgba(15, 23, 42, 0.6);">
+            <div class="panel-header">
+              <div>
+                <h4 style="color: #fff; font-size: 16px; font-weight: 700;">📈 Observed Risk vs Counterfactual Trajectory</h4>
+                <div class="panel-subtitle">Dynamic comparison across 6h, 12h, 24h, and 48h horizons</div>
+              </div>
+            </div>
+            <div style="height: 290px;">
+              <canvas id="counterfactualTrajectoryCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         NOVELTY SECTION: BEDSIDE ICU CALCULATORS & INFUSION TITRATION SUITE
+         ========================================================================= -->
+    <section id="icu-calculators" class="web-section">
+      <div class="panel-card">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
+          <div>
+            <div class="hero-eyebrow" style="margin-bottom: 8px;">Critical Care Toolkit</div>
+            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🧮 Bedside ICU Calculators & Infusion Engine</h2>
+            <div class="panel-subtitle">
+              Weight-based vasoactive pump rate calculators, Surviving Sepsis 1-hour bundle checklists, and ARDS Berlin classification
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculator Navigation Tabs -->
+        <div class="calc-nav-tabs">
+          <button class="calc-tab-btn active" id="calc-tab-pressors" onclick="switchCalcTab('pressors')">
+            💉 Vasopressor & Inotrope Titration
+          </button>
+          <button class="calc-tab-btn" id="calc-tab-sepsis" onclick="switchCalcTab('sepsis')">
+            ⏱️ Surviving Sepsis 1-Hour Bundle
+          </button>
+          <button class="calc-tab-btn" id="calc-tab-ards" onclick="switchCalcTab('ards')">
+            🫁 PaO2 / FiO2 ARDS Classifier
+          </button>
+        </div>
+
+        <!-- TAB 1: VASOPRESSOR INFUSION CALCULATOR -->
+        <div id="calc-panel-pressors">
+          <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px;">
+            <div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                <div>
+                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">Medication:</label>
+                  <select id="calc-drug-select" class="clinical-select" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" onchange="recalculateInfusion()">
+                    <option value="norepinephrine">Norepinephrine (Levophed)</option>
+                    <option value="epinephrine">Epinephrine (Adrenaline)</option>
+                    <option value="vasopressin">Vasopressin (Pitressin)</option>
+                    <option value="dobutamine">Dobutamine (Dobutrex)</option>
+                  </select>
+                </div>
+                <div>
+                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">Patient Weight (kg):</label>
+                  <input type="number" id="calc-weight-input" value="70" min="30" max="250" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" oninput="recalculateInfusion()">
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                <div>
+                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">Desired Dose (mcg/kg/min):</label>
+                  <input type="number" id="calc-dose-input" value="0.15" step="0.02" min="0.01" max="2.0" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" oninput="recalculateInfusion()">
+                </div>
+                <div>
+                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">Concentration (mg / mL):</label>
+                  <select id="calc-conc-select" class="clinical-select" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" onchange="recalculateInfusion()">
+                    <option value="4:250">Standard: 4 mg in 250 mL (16 mcg/mL)</option>
+                    <option value="8:250">Double: 8 mg in 250 mL (32 mcg/mL)</option>
+                    <option value="16:250">Quad: 16 mg in 250 mL (64 mcg/mL)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Calculation Output Display Card -->
+            <div style="background: rgba(15, 43, 70, 0.85); border: 1px solid var(--border-teal); border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 12px; color: var(--teal); font-weight: 700; text-transform: uppercase; font-family: var(--font-mono);">Infusion Pump Delivery Rate:</span>
+                  <span id="calc-safety-badge" class="risk-level-badge badge-low" style="margin: 0; padding: 4px 10px;">Safe Titration</span>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 8px;">
+                  <strong id="calc-pump-rate" style="font-size: 38px; color: #fff; font-family: var(--font-mono);">39.38</strong>
+                  <span style="font-size: 16px; color: var(--teal); font-weight: 700;">mL / hr</span>
+                </div>
+                <div style="font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-top: 4px;">
+                  Delivers <strong id="calc-total-mcg" style="color: #fff;">10.50 mcg/min</strong> at 16 mcg/mL concentration
+                </div>
+              </div>
+
+              <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; margin-top: 14px; border-left: 3px solid var(--teal);">
+                <div style="font-size: 11px; font-weight: 800; color: var(--teal); text-transform: uppercase;">Clinical Practice Guideline:</div>
+                <div id="calc-guideline-text" style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
+                  Norepinephrine 1st-line in septic shock. Target MAP ≥ 65 mmHg. If dose &gt; 0.25 mcg/kg/min, add Vasopressin (0.03 U/min). Max threshold: 0.50 mcg/kg/min.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: SURVIVING SEPSIS 1-HOUR BUNDLE -->
+        <div id="calc-panel-sepsis" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
+            <div>
+              <h4 style="color: #fff; margin-bottom: 12px;">Surviving Sepsis Campaign (SSC 2021) 1-Hour Bundle:</h4>
+              
+              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
+                <input type="checkbox" checked>
+                <div>
+                  <strong style="color: #fff; font-size: 14px;">1. Measure Serum Lactate Level</strong>
+                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Re-measure within 2-4 hours if initial lactate &gt; 2.0 mmol/L to guide resuscitation.</p>
+                </div>
+              </div>
+
+              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
+                <input type="checkbox" checked>
+                <div>
+                  <strong style="color: #fff; font-size: 14px;">2. Obtain Blood Cultures Prior to Antibiotics</strong>
+                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Draw 2 sets (aerobic + anaerobic) without delaying antimicrobial initiation &gt; 45 mins.</p>
+                </div>
+              </div>
+
+              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
+                <input type="checkbox">
+                <div>
+                  <strong style="color: #fff; font-size: 14px;">3. Administer Broad-Spectrum IV Antimicrobials</strong>
+                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Initiate empiric broad-coverage therapy (e.g. Vancomycin + Cefepime) within 60 mins.</p>
+                </div>
+              </div>
+
+              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
+                <input type="checkbox">
+                <div>
+                  <strong style="color: #fff; font-size: 14px;">4. Administer 30 mL/kg Crystalloids for Hypotension or Lactate ≥ 4.0</strong>
+                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Use balanced crystalloids (Plasma-Lyte / Lactated Ringer's) within 3 hours.</p>
+                </div>
+              </div>
+
+              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
+                <input type="checkbox">
+                <div>
+                  <strong style="color: #fff; font-size: 14px;">5. Apply Vasopressors if MAP &lt; 65 mmHg During/After Resuscitation</strong>
+                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Maintain target MAP ≥ 65 mmHg with Norepinephrine.</p>
+                </div>
+              </div>
+            </div>
+
+            <div style="background: rgba(15, 43, 70, 0.8); border: 1px solid var(--border); border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="font-size: 12px; color: var(--teal); font-weight: 700; text-transform: uppercase; font-family: var(--font-mono);">
+                  Recommended Fluid Bolus (30 mL/kg):
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 6px;">
+                  <strong id="calc-fluid-bolus-vol" style="font-size: 36px; color: #38BDF8; font-family: var(--font-mono);">2,100</strong>
+                  <span style="font-size: 16px; color: #38BDF8; font-weight: 700;">mL Balanced Crystalloids</span>
+                </div>
+                <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Based on patient weight of <span id="calc-fluid-weight-lbl">70</span> kg</div>
+              </div>
+
+              <div style="margin-top: 20px; padding: 14px; background: rgba(0,0,0,0.3); border-radius: 8px; text-align: center;">
+                <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono);">Bundle Execution Timer:</div>
+                <div id="bundle-timer-display" style="font-size: 28px; font-weight: 800; color: #F59E0B; font-family: var(--font-mono); margin: 4px 0;">
+                  00:54:22 REMAINING
+                </div>
+                <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 11px;" onclick="resetBundleTimer()">⏱️ Reset 1-Hr Timer</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: ARDS BERLIN CLASSIFIER -->
+        <div id="calc-panel-ards" style="display: none;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                <div>
+                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">PaO2 (from ABG, mmHg):</label>
+                  <input type="number" id="calc-pao2-input" value="68" min="30" max="300" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" oninput="recalculateArds()">
+                </div>
+                <div>
+                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">FiO2 (Fraction 0.21-1.00):</label>
+                  <input type="number" id="calc-fio2-input" value="0.60" step="0.05" min="0.21" max="1.00" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" oninput="recalculateArds()">
+                </div>
+              </div>
+
+              <div style="padding: 14px; background: rgba(15, 43, 70, 0.6); border-radius: var(--r-sm); border: 1px solid var(--border-subtle);">
+                <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px;">Berlin ARDS Diagnostic Criteria (JAMA 2012):</div>
+                <ul style="font-size: 12px; color: var(--muted); margin-left: 18px; line-height: 1.6;">
+                  <li><strong>Timing:</strong> Within 1 week of known clinical insult or new/worsening respiratory symptoms.</li>
+                  <li><strong>Chest Imaging:</strong> Bilateral opacities not fully explained by effusions or collapse.</li>
+                  <li><strong>Origin of Edema:</strong> Not fully explained by cardiac failure or fluid overload.</li>
+                </ul>
+              </div>
+            </div>
+
+            <div style="background: rgba(15, 43, 70, 0.85); border: 1px solid #A78BFA; border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <span style="font-size: 12px; color: #A78BFA; font-weight: 700; text-transform: uppercase; font-family: var(--font-mono);">PaO2 / FiO2 (P/F Ratio):</span>
+                  <span id="ards-severity-badge" class="risk-level-badge badge-high" style="margin: 0; padding: 4px 10px;">Moderate ARDS</span>
+                </div>
+                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 8px;">
+                  <strong id="ards-pf-ratio-val" style="font-size: 38px; color: #fff; font-family: var(--font-mono);">113.3</strong>
+                  <span style="font-size: 16px; color: #A78BFA; font-weight: 700;">mmHg</span>
+                </div>
+                <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
+                  Severity: <strong id="ards-category-text" style="color: #F87171;">Moderate ARDS (100 &lt; P/F ≤ 200 with PEEP ≥ 5)</strong>
+                </div>
+              </div>
+
+              <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; margin-top: 14px; border-left: 3px solid #A78BFA;">
+                <div style="font-size: 11px; font-weight: 800; color: #A78BFA; text-transform: uppercase;">Ventilation Management Strategy:</div>
+                <div style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
+                  Target Lung-Protective Ventilation: Tidal volume 6 mL/kg PBW, plateau pressure &le; 30 cmH2O. If P/F &lt; 150, consider early prone positioning (16h/day) and neuromuscular blockade.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         SECTION 4: MULTIMODAL EXPLAINABILITY STUDIO
          ========================================================================= -->
     <section id="explainability-studio" class="web-section">
       
@@ -463,12 +935,12 @@
           <div class="hero-eyebrow" style="margin-bottom: 8px;">Explainable AI Engine</div>
           <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🔍 Multimodal Explainability Studio</h2>
           <p class="panel-subtitle">
-            Interpreting physiological risk factors with SHAP and unstructured clinical narratives with token saliency.
+            Interpreting physiological risk factors with SHAP, unstructured clinical narratives with token saliency, and latent patient phenotyping.
           </p>
         </div>
       </div>
 
-      <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px;">
+      <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; margin-bottom: 24px;">
         
         <!-- SHAP Waterfall & Contributions -->
         <div class="panel-card" style="margin: 0;">
@@ -478,7 +950,7 @@
               <div class="panel-subtitle">Top physiological drivers pushing risk UP (Red) or DOWN (Teal)</div>
             </div>
           </div>
-          <div style="height: 320px;">
+          <div style="height: 300px;">
             <canvas id="shapFeatureCanvas"></canvas>
           </div>
         </div>
@@ -491,11 +963,39 @@
               <div class="panel-subtitle">Influential clinical tokens highlighted by attention saliency</div>
             </div>
           </div>
-          <div id="highlighted-note-box" class="clinical-note-box">
+          <div id="highlighted-note-box" class="clinical-note-box" style="height: 240px; overflow-y: auto;">
             Loading highlighted text...
           </div>
         </div>
 
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px;">
+        <!-- Cross-Modal Attention Heatmap Matrix -->
+        <div class="panel-card" style="margin: 0;">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">🔗 Cross-Modal Attention Heatmap Matrix</h3>
+              <div class="panel-subtitle">Bi-directional grounding between clinical note sentences and physiological streams</div>
+            </div>
+          </div>
+          <div id="cross-modal-matrix-container" style="overflow-x: auto;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- 2D Latent Space Patient Phenotyping -->
+        <div class="panel-card" style="margin: 0;">
+          <div class="panel-header">
+            <div>
+              <h3 class="panel-title">🧬 Multimodal Latent Space Projection</h3>
+              <div class="panel-subtitle">2D PCA/t-SNE manifold clustering of ICU survivors vs deteriorating cohorts</div>
+            </div>
+          </div>
+          <div style="height: 280px;">
+            <canvas id="latentSpaceCanvas"></canvas>
+          </div>
+        </div>
       </div>
 
     </section>
@@ -675,12 +1175,15 @@
     <section id="ward-telemetry" class="web-section">
       
       <div class="panel-card">
-        <div class="panel-header">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
           <div>
             <div class="hero-eyebrow" style="margin-bottom: 8px;">Live Ward Overview</div>
             <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🏥 ICU Ward Patient Telemetry Grid</h2>
             <div class="panel-subtitle">Click any bed card to immediately load their live records into the Assessment Studio above</div>
           </div>
+          <button class="btn btn-secondary" style="border-color: #EF4444; color: #F87171; font-weight: 700;" onclick="openRapidResponseModal()">
+            🚨 Trigger Rapid Response Dispatch
+          </button>
         </div>
 
         <div id="ward-beds-container" class="bed-grid">
@@ -717,6 +1220,57 @@
 
     </section>
 
+  </div>
+
+  <!-- RAPID RESPONSE / CODE BLUE DISPATCH MODAL -->
+  <div id="rapidResponseModal" class="modal-overlay" onclick="if(event.target===this) closeRapidResponseModal()">
+    <div class="modal-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(239, 68, 68, 0.3); padding-bottom: 14px; margin-bottom: 18px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <span style="font-size: 24px;">🚨</span>
+          <div>
+            <h3 style="color: #F87171; font-size: 18px; font-weight: 800; margin: 0;">EMERGENCY RAPID RESPONSE DISPATCH</h3>
+            <div style="font-size: 12px; color: #CBD5E1;">Stat Bedside Critical Care Notification</div>
+          </div>
+        </div>
+        <button onclick="closeRapidResponseModal()" style="background: transparent; border: none; color: var(--muted); font-size: 20px; cursor: pointer;">✕</button>
+      </div>
+
+      <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+          <span>Target Bed: <strong id="modal-bed-label" style="color: #fff;">Bed 01 — Patient #10042</strong></span>
+          <span>Risk Level: <strong style="color: #EF4444;">CRITICAL (84.2%)</strong></span>
+        </div>
+        <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">
+          Indication: Refractory Septic Shock, MAP 52 mmHg, Lactic Acidosis 4.8 mmol/L
+        </div>
+      </div>
+
+      <div style="margin-bottom: 18px;">
+        <h4 style="color: #fff; font-size: 14px; margin-bottom: 8px;">Automated Rapid Response Team Page:</h4>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
+          <div style="background: rgba(15, 43, 70, 0.6); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #38BDF8;">
+            👨‍⚕️ <strong>ICU Fellow / Attending</strong>: Paged
+          </div>
+          <div style="background: rgba(15, 43, 70, 0.6); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #A78BFA;">
+            🫁 <strong>Respiratory Therapist</strong>: En Route
+          </div>
+          <div style="background: rgba(15, 43, 70, 0.6); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #10B981;">
+            💉 <strong>Critical Care Pharmacist</strong>: Paged
+          </div>
+          <div style="background: rgba(15, 43, 70, 0.6); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #F59E0B;">
+            🛒 <strong>Code Cart & Defibrillator</strong>: Dispatched
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; justify-content: flex-end;">
+        <button class="btn btn-secondary" onclick="closeRapidResponseModal()">Dismiss</button>
+        <button class="btn btn-primary" style="background: linear-gradient(135deg, #EF4444, #B91C1C); border-color: #EF4444;" onclick="confirmDispatchAudio()">
+          📢 Confirm Team Audio Alert
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- FOOTER -->

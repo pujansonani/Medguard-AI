@@ -775,6 +775,315 @@ async function initEdaCharts() {
 }
 
 // -----------------------------------------------------------------------------
+// Autonomous SBAR Audio Copilot (Speech Synthesis + Clinical Audio)
+// -----------------------------------------------------------------------------
+let activeSpeechUtterance = null;
+
+function playHospitalChime() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    
+    // Play two-tone medical alert chime (523Hz C5 -> 659Hz E5)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = "sine";
+    osc1.frequency.setValueAtTime(523.25, ctx.currentTime);
+    osc1.frequency.setValueAtTime(659.25, ctx.currentTime + 0.15);
+    
+    gain1.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start();
+    osc1.stop(ctx.currentTime + 0.5);
+  } catch (e) {
+    console.warn("Audio chime unsupported:", e);
+  }
+}
+
+async function playSbarBriefing() {
+  stopSbarAudio();
+  playHospitalChime();
+
+  const card = document.getElementById("sbar-briefing-card");
+  const icon = document.getElementById("sbar-btn-icon");
+  if (card) card.style.display = "block";
+  if (icon) icon.innerText = "🔊";
+
+  const ptDemog = document.getElementById("pt-demog-display").innerText;
+  const noteText = document.getElementById("pt-notes-input").value;
+  const observations = window._currentObservations || [];
+
+  const payload = {
+    demographics: {
+      subject_id: parseInt((document.getElementById("pt-id-display").innerText || "").replace("#", ""), 10) || 10042,
+      stay_id: 30042,
+      age: 68,
+      gender: "M",
+      icu_type: "MICU",
+      admission_type: "EMERGENCY"
+    },
+    timeseries: observations,
+    clinical_notes: noteText
+  };
+
+  try {
+    const res = await fetch("/sbar/briefing", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      document.getElementById("sbar-situation-text").innerText = data.sbar.situation;
+      document.getElementById("sbar-background-text").innerText = data.sbar.background;
+      document.getElementById("sbar-assessment-text").innerText = data.sbar.assessment;
+      document.getElementById("sbar-recommendation-text").innerText = data.sbar.recommendation;
+
+      // Web Speech Synthesis
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(data.speech_script);
+        utter.rate = 1.0;
+        utter.pitch = 1.0;
+        utter.onend = () => { if (icon) icon.innerText = "🎙️"; };
+        utter.onerror = () => { if (icon) icon.innerText = "🎙️"; };
+        activeSpeechUtterance = utter;
+        window.speechSynthesis.speak(utter);
+      }
+    }
+  } catch (err) {
+    console.warn("SBAR API error:", err);
+  }
+}
+
+function stopSbarAudio() {
+  if ("speechSynthesis" in window) {
+    window.speechSynthesis.cancel();
+  }
+  const icon = document.getElementById("sbar-btn-icon");
+  if (icon) icon.innerText = "🎙️";
+}
+
+// -----------------------------------------------------------------------------
+// Export Clinical Research Dossier
+// -----------------------------------------------------------------------------
+function exportClinicalDossier() {
+  const ptId = document.getElementById("pt-id-display").innerText;
+  const demog = document.getElementById("pt-demog-display").innerText;
+  const risk = document.getElementById("risk-val-display").innerText;
+  const unc = document.getElementById("uncertainty-val-display").innerText;
+  const structW = document.getElementById("struct-w-label").innerText;
+  const textW = document.getElementById("text-w-label").innerText;
+  const notes = document.getElementById("pt-notes-input").value;
+  const sofa = document.getElementById("sofa-proxy-val").innerText;
+  const saps = document.getElementById("saps-proxy-val").innerText;
+
+  const dossier = `
+# ==============================================================================
+# MEDGUARD AI: CLINICAL MULTIMODAL RESEARCH DOSSIER
+# ==============================================================================
+Timestamp: ${new Date().toISOString()}
+Patient Identifier: ${ptId} (${demog})
+System Status: Academic Research Prototype (Zero-Leakage MIMIC-IV Calibrated)
+
+--- PREDICTIVE INTELLIGENCE & METRICS ---
+• 48-Hour Deterioration Probability: ${risk}
+• Epistemic Uncertainty: ${unc}
+• Multimodal Modality Attention: Physiology (${structW}) | Clinical Notes (${textW})
+• Baseline Organ Severity: SOFA Proxy (${sofa}) | SAPS II (${saps})
+
+--- CONTEMPORANEOUS CLINICAL NOTES (24h Window) ---
+${notes}
+
+--- CLINICAL DISCLAIMER ---
+RESEARCH PROTOTYPE ONLY: This dossier was generated for scientific evaluation.
+Not a certified medical device; never use for triage or treatment decisions.
+==============================================================================
+  `.trim();
+
+  const blob = new Blob([dossier], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `MEDGUARD_Clinical_Dossier_${ptId.replace('#', '')}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// -----------------------------------------------------------------------------
+// What-If Counterfactual Intervention Simulator
+// -----------------------------------------------------------------------------
+async function onCounterfactualSliderChange() {
+  const deltaMap = parseFloat(document.getElementById("cf-slider-map").value);
+  const deltaLactate = parseFloat(document.getElementById("cf-slider-lactate").value);
+  const deltaSpo2 = parseFloat(document.getElementById("cf-slider-spo2").value);
+  const deltaHr = parseFloat(document.getElementById("cf-slider-hr").value);
+
+  document.getElementById("cf-map-val").innerText = `+${deltaMap} mmHg`;
+  document.getElementById("cf-lactate-val").innerText = `${deltaLactate.toFixed(1)} mmol/L`;
+  document.getElementById("cf-spo2-val").innerText = `+${deltaSpo2}%`;
+  document.getElementById("cf-hr-val").innerText = `${deltaHr} bpm`;
+
+  const observations = window._currentObservations || [];
+  const noteText = document.getElementById("pt-notes-input").value;
+
+  const payload = {
+    patient_request: {
+      demographics: {
+        subject_id: 10042,
+        stay_id: 30042,
+        age: 68,
+        gender: "M",
+        icu_type: "MICU",
+        admission_type: "EMERGENCY"
+      },
+      timeseries: observations,
+      clinical_notes: noteText
+    },
+    interventions: {
+      map: deltaMap,
+      lactate: deltaLactate,
+      spo2: deltaSpo2,
+      heart_rate: deltaHr
+    }
+  };
+
+  try {
+    const res = await fetch("/counterfactual/simulate", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      renderCounterfactualTrajectory(data);
+    }
+  } catch (err) {
+    console.warn("Counterfactual API error:", err);
+  }
+}
+
+function renderCounterfactualTrajectory(data) {
+  const ctx = document.getElementById("counterfactualTrajectoryCanvas");
+  if (!ctx || typeof Chart === "undefined") return;
+
+  if (activeCharts["counterfactualTrajectory"]) {
+    try { activeCharts["counterfactualTrajectory"].destroy(); } catch(e) {}
+  }
+
+  const baseTraj = data.baseline_trajectory;
+  const cfTraj = data.counterfactual_trajectory;
+  const horizons = ["6 Hours", "12 Hours", "24 Hours", "48 Hours"];
+  const baseVals = [baseTraj["6h"] * 100, baseTraj["12h"] * 100, baseTraj["24h"] * 100, baseTraj["48h"] * 100];
+  const cfVals = [cfTraj["6h"] * 100, cfTraj["12h"] * 100, cfTraj["24h"] * 100, cfTraj["48h"] * 100];
+
+  // Update Badge & Text
+  const deltaAbs = (data.absolute_risk_reduction * 100).toFixed(1);
+  const deltaRel = data.relative_risk_reduction_pct.toFixed(1);
+  document.getElementById("cf-risk-delta-text").innerText = `-${deltaAbs}% Absolute (${deltaRel}% Rel.)`;
+  document.getElementById("cf-status-badge").innerText = data.status;
+
+  activeCharts["counterfactualTrajectory"] = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: horizons,
+      datasets: [
+        {
+          label: "Observed Baseline Trajectory (%)",
+          data: baseVals,
+          borderColor: "#FF5F56",
+          backgroundColor: "transparent",
+          borderDash: [5, 5],
+          borderWidth: 2.5,
+          pointRadius: 5
+        },
+        {
+          label: "Post-Intervention Counterfactual (%)",
+          data: cfVals,
+          borderColor: "#3ECFB2",
+          backgroundColor: "rgba(62, 207, 178, 0.15)",
+          fill: true,
+          borderWidth: 3,
+          pointRadius: 6
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: "#8B9AAD", font: { family: "Plus Jakarta Sans", size: 12 } } },
+        tooltip: { backgroundColor: "#0F2B46", borderColor: "rgba(62, 207, 178, 0.3)", borderWidth: 1 }
+      },
+      scales: {
+        x: { grid: { color: "rgba(255, 255, 255, 0.06)" }, ticks: { color: "#8B9AAD" } },
+        y: { min: 0, max: 100, grid: { color: "rgba(255, 255, 255, 0.06)" }, ticks: { color: "#8B9AAD", callback: v => `${v}%` } }
+      }
+    }
+  });
+}
+
+// -----------------------------------------------------------------------------
+// Cross-Modal Attention Heatmap Matrix
+// -----------------------------------------------------------------------------
+async function renderCrossModalAttentionMatrix() {
+  const container = document.getElementById("cross-modal-matrix-container");
+  if (!container) return;
+
+  const observations = window._currentObservations || [];
+  const noteText = document.getElementById("pt-notes-input").value;
+
+  const payload = {
+    demographics: { subject_id: 10042, stay_id: 30042, age: 68, gender: "M", icu_type: "MICU", admission_type: "EMERGENCY" },
+    timeseries: observations,
+    clinical_notes: noteText
+  };
+
+  try {
+    const res = await fetch("/cross-modal/attention", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const cols = data.vitals_columns;
+      const rows = data.clauses_matrix;
+
+      let html = `
+        <table class="cliexa-table" style="font-size: 12px; margin: 0;">
+          <thead>
+            <tr>
+              <th>Clinical Note Sentence Clause</th>
+              ${cols.map(c => `<th>${c}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(r => `
+              <tr>
+                <td style="max-width: 200px; color: #E2E8F0; font-style: italic;">"${r.clause}"</td>
+                ${r.attention.map(w => {
+                  const bg = w > 0.6 ? `rgba(62, 207, 178, ${w * 0.8})` : `rgba(255, 255, 255, 0.04)`;
+                  const textColor = w > 0.6 ? "#0F2B46" : "#8B9AAD";
+                  return `<td style="text-align: center; background: ${bg}; color: ${textColor}; font-weight: ${w > 0.6 ? '800' : '500'}; font-family: 'Space Mono'; border-radius: 4px;">${w.toFixed(2)}</td>`;
+                }).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+      container.innerHTML = html;
+    }
+  } catch (err) {
+    console.warn("Cross-modal attention error:", err);
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Robustness Stress Test Curve
 // -----------------------------------------------------------------------------
 function initRobustnessChart() {
@@ -817,6 +1126,547 @@ function initRobustnessChart() {
   });
 }
 
+// -----------------------------------------------------------------------------
+// 2D Latent Space Patient Phenotyping Projection (PCA / t-SNE)
+// -----------------------------------------------------------------------------
+async function initLatentSpaceChart() {
+  const ctx = document.getElementById("latentSpaceCanvas");
+  if (!ctx || typeof Chart === "undefined") return;
+
+  try {
+    const res = await fetch("/latent/projections");
+    const data = await res.json();
+    const points = data.points || [];
+
+    const survPoints = points.filter(p => p.outcome === "Survivor").map(p => ({ x: p.x, y: p.y }));
+    const detPoints = points.filter(p => p.outcome === "Non-Survivor").map(p => ({ x: p.x, y: p.y }));
+
+    new Chart(ctx, {
+      type: "scatter",
+      data: {
+        datasets: [
+          {
+            label: "Stable ICU Survivors",
+            data: survPoints,
+            backgroundColor: "rgba(62, 207, 178, 0.7)",
+            borderColor: "#3ECFB2",
+            pointRadius: 6,
+            pointHoverRadius: 8
+          },
+          {
+            label: "Deteriorating Patients",
+            data: detPoints,
+            backgroundColor: "rgba(255, 95, 86, 0.85)",
+            borderColor: "#FF5F56",
+            pointRadius: 7,
+            pointHoverRadius: 9
+          },
+          {
+            label: "Current Patient Index",
+            data: [{ x: 1.25, y: 0.95 }],
+            backgroundColor: "#F59E0B",
+            borderColor: "#FFFFFF",
+            borderWidth: 2,
+            pointRadius: 11,
+            pointStyle: "rectRot"
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { labels: { color: "#8B9AAD", font: { size: 11 } } },
+          tooltip: { backgroundColor: "#0F2B46", borderColor: "rgba(62, 207, 178, 0.3)", borderWidth: 1 }
+        },
+        scales: {
+          x: { title: { display: true, text: "Multimodal Latent Dimension 1 (Hemodynamics)", color: "#8B9AAD" }, grid: { color: "rgba(255, 255, 255, 0.06)" }, ticks: { color: "#8B9AAD" } },
+          y: { title: { display: true, text: "Multimodal Latent Dimension 2 (Acuity/NLP)", color: "#8B9AAD" }, grid: { color: "rgba(255, 255, 255, 0.06)" }, ticks: { color: "#8B9AAD" } }
+        }
+      }
+    });
+  } catch (e) {
+    console.warn("Latent space error:", e);
+  }
+}
+
+// Hook into analyzePatientRecord to auto-trigger novel tools
+const originalAnalyze = analyzePatientRecord;
+analyzePatientRecord = async function() {
+  await originalAnalyze();
+  onCounterfactualSliderChange();
+  renderCrossModalAttentionMatrix();
+  refreshDigitalTwinData();
+};
+
+// -----------------------------------------------------------------------------
+// NOVELTY 1: DIGITAL TWIN MULTI-ORGAN DYSFUNCTION
+// -----------------------------------------------------------------------------
+async function refreshDigitalTwinData() {
+  const container = document.getElementById("organ-twin-container");
+  if (!container) return;
+
+  const observations = window._currentObservations || [];
+  const noteText = document.getElementById("pt-notes-input")?.value || "";
+
+  const payload = {
+    demographics: { subject_id: 10042, stay_id: 30042, age: 68, gender: "M", icu_type: "MICU", admission_type: "EMERGENCY" },
+    timeseries: observations,
+    clinical_notes: noteText
+  };
+
+  try {
+    const res = await fetch("/organ-risk/digital-twin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const stressVal = document.getElementById("digital-twin-overall-stress");
+      if (stressVal) {
+        stressVal.innerText = `${data.overall_stress_score}%`;
+        stressVal.style.color = data.overall_stress_score > 60 ? "#EF4444" : (data.overall_stress_score > 35 ? "#F59E0B" : "#10B981");
+      }
+
+      const sys = data.systems;
+      let html = "";
+      for (const [key, s] of Object.entries(sys)) {
+        const barColor = s.stress_pct > 60 ? "#EF4444" : (s.stress_pct > 35 ? "#F59E0B" : "#10B981");
+        const statusBadgeClass = s.stress_pct > 60 ? "badge-high" : (s.stress_pct > 35 ? "badge-mod" : "badge-low");
+        html += `
+          <div class="organ-card">
+            <div class="organ-card-header">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <div class="organ-icon-pod" style="background: ${barColor}15; border-color: ${barColor}40;">
+                  ${s.icon}
+                </div>
+                <div>
+                  <h4 style="color: #fff; font-size: 15px; margin: 0;">${s.name}</h4>
+                  <div style="font-size: 11px; color: var(--muted); font-family: 'Space Mono';">${s.biomarkers}</div>
+                </div>
+              </div>
+              <span class="risk-level-badge ${statusBadgeClass}" style="margin: 0; padding: 3px 8px; font-size: 10px;">
+                ${s.status}
+              </span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 11px; font-family: 'Space Mono';">
+              <span style="color: var(--muted);">System Stress:</span>
+              <strong style="color: ${barColor};">${s.stress_pct}%</strong>
+            </div>
+            <div class="organ-stress-bar">
+              <div class="organ-stress-fill" style="width: ${s.stress_pct}%; background: ${barColor};"></div>
+            </div>
+
+            <div style="background: rgba(0,0,0,0.25); padding: 8px 10px; border-radius: 6px; font-size: 11px; color: #CBD5E1; line-height: 1.4; border-left: 2px solid ${barColor};">
+              <strong>Action:</strong> ${s.clinical_action}
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = html;
+
+      const pearls = document.getElementById("organ-twin-pearls-text");
+      if (pearls && data.clinical_pearls?.length) {
+        pearls.innerHTML = data.clinical_pearls.join("<br>");
+      }
+    }
+  } catch (err) {
+    console.warn("Digital twin error:", err);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// NOVELTY 2: AUTONOMOUS BEDSIDE AI COPILOT
+// -----------------------------------------------------------------------------
+async function sendCopilotPreset(promptText) {
+  const input = document.getElementById("copilot-user-input");
+  if (input) input.value = promptText;
+  await sendCopilotMessage();
+}
+
+async function sendCopilotMessage() {
+  const input = document.getElementById("copilot-user-input");
+  const area = document.getElementById("copilot-messages-area");
+  if (!input || !area) return;
+
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = "";
+
+  // Append user bubble
+  const userBubble = document.createElement("div");
+  userBubble.className = "copilot-bubble user";
+  userBubble.innerHTML = `<div style="font-size: 11px; color: var(--teal); margin-bottom: 2px; font-weight: 700;">Attending Clinician:</div>${text}`;
+  area.appendChild(userBubble);
+
+  // Append loading typing indicator
+  const loadingBubble = document.createElement("div");
+  loadingBubble.className = "copilot-bubble bot";
+  loadingBubble.id = "copilot-loading-indicator";
+  loadingBubble.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span class="pulse-dot" style="background: var(--teal);"></span>
+      <span style="color: var(--teal); font-size: 13px; font-family: 'Space Mono';">Synthesizing clinical evidence & multimodal trajectory...</span>
+    </div>
+  `;
+  area.appendChild(loadingBubble);
+  area.scrollTop = area.scrollHeight;
+
+  const observations = window._currentObservations || [];
+  const noteText = document.getElementById("pt-notes-input")?.value || "";
+
+  const payload = {
+    patient_request: {
+      demographics: { subject_id: 10042, stay_id: 30042, age: 68, gender: "M", icu_type: "MICU", admission_type: "EMERGENCY" },
+      timeseries: observations,
+      clinical_notes: noteText
+    },
+    prompt: text
+  };
+
+  try {
+    const res = await fetch("/copilot/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    // Remove loading
+    const loader = document.getElementById("copilot-loading-indicator");
+    if (loader) loader.remove();
+
+    if (res.ok) {
+      const data = await res.json();
+      const botBubble = document.createElement("div");
+      botBubble.className = "copilot-bubble bot";
+
+      let ordersHtml = "";
+      if (data.suggested_orders?.length) {
+        ordersHtml = `
+          <div style="margin-top: 12px; padding: 12px; background: rgba(16, 185, 129, 0.08); border: 1px solid #10B981; border-radius: 6px;">
+            <div style="font-size: 11px; font-weight: 800; color: #10B981; text-transform: uppercase; margin-bottom: 6px;">📋 Actionable Bedside Order Set:</div>
+            <ul style="margin: 0; padding-left: 18px; font-size: 13px; color: #E2E8F0;">
+              ${data.suggested_orders.map(o => `<li>${o}</li>`).join("")}
+            </ul>
+          </div>
+        `;
+      }
+
+      let citationsHtml = "";
+      if (data.citations?.length) {
+        citationsHtml = `
+          <div style="margin-top: 10px; font-size: 11px; color: var(--muted); font-family: 'Space Mono';">
+            📚 <strong>Evidence:</strong> ${data.citations.join(" • ")}
+          </div>
+        `;
+      }
+
+      // Convert Markdown headers and bold
+      let formattedReply = data.reply
+        .replace(/### (.*?)\n/g, '<h4 style="color: #fff; font-size: 15px; margin: 4px 0 8px;">$1</h4>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n/g, '<br><br>');
+
+      botBubble.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="pulse-dot" style="background: var(--teal);"></span>
+            <strong style="color: var(--teal); font-size: 13px;">MEDGUARD Clinical Copilot</strong>
+          </div>
+          <span class="risk-level-badge badge-high" style="margin: 0; padding: 2px 8px; font-size: 10px;">${data.risk_level}</span>
+        </div>
+        <div style="color: #E2E8F0; font-size: 13px; line-height: 1.6;">
+          ${formattedReply}
+        </div>
+        ${ordersHtml}
+        ${citationsHtml}
+      `;
+      area.appendChild(botBubble);
+    }
+  } catch (err) {
+    console.warn("Copilot chat error:", err);
+    const loader = document.getElementById("copilot-loading-indicator");
+    if (loader) loader.remove();
+  }
+
+  area.scrollTop = area.scrollHeight;
+}
+
+function dictateCopilotQuestion() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("Speech recognition is not supported in this browser. Please type your question.");
+    return;
+  }
+  const rec = new SpeechRecognition();
+  rec.lang = "en-US";
+  rec.start();
+  const input = document.getElementById("copilot-user-input");
+  if (input) input.placeholder = "Listening... Speak now...";
+
+  rec.onresult = (e) => {
+    const transcript = e.results[0][0].transcript;
+    if (input) {
+      input.value = transcript;
+      input.placeholder = "Ask about patient vitals, medications, clinical guidelines...";
+    }
+    sendCopilotMessage();
+  };
+  rec.onerror = () => {
+    if (input) input.placeholder = "Ask about patient vitals, medications, clinical guidelines...";
+  };
+}
+
+// -----------------------------------------------------------------------------
+// NOVELTY 3: BEDSIDE ICU CALCULATORS
+// -----------------------------------------------------------------------------
+function switchCalcTab(tab) {
+  document.querySelectorAll(".calc-tab-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("calc-panel-pressors").style.display = "none";
+  document.getElementById("calc-panel-sepsis").style.display = "none";
+  document.getElementById("calc-panel-ards").style.display = "none";
+
+  if (tab === "pressors") {
+    document.getElementById("calc-tab-pressors").classList.add("active");
+    document.getElementById("calc-panel-pressors").style.display = "block";
+    recalculateInfusion();
+  } else if (tab === "sepsis") {
+    document.getElementById("calc-tab-sepsis").classList.add("active");
+    document.getElementById("calc-panel-sepsis").style.display = "block";
+  } else if (tab === "ards") {
+    document.getElementById("calc-tab-ards").classList.add("active");
+    document.getElementById("calc-panel-ards").style.display = "block";
+    recalculateArds();
+  }
+}
+
+async function recalculateInfusion() {
+  const drug = document.getElementById("calc-drug-select")?.value || "norepinephrine";
+  const weight = parseFloat(document.getElementById("calc-weight-input")?.value || "70");
+  const dose = parseFloat(document.getElementById("calc-dose-input")?.value || "0.15");
+  const concParts = (document.getElementById("calc-conc-select")?.value || "4:250").split(":");
+  const mg = parseFloat(concParts[0]);
+  const ml = parseFloat(concParts[1]);
+
+  const payload = {
+    drug: drug,
+    patient_weight_kg: weight,
+    desired_dose: dose,
+    concentration_mg: mg,
+    bag_volume_ml: ml
+  };
+
+  try {
+    const res = await fetch("/orders/calculate-infusion", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const pumpRate = document.getElementById("calc-pump-rate");
+      const totalMcg = document.getElementById("calc-total-mcg");
+      const badge = document.getElementById("calc-safety-badge");
+      const guide = document.getElementById("calc-guideline-text");
+
+      if (pumpRate) pumpRate.innerText = data.rate_ml_hr.toFixed(2);
+      if (totalMcg) totalMcg.innerText = `${(data.desired_dose * data.patient_weight_kg).toFixed(2)} mcg/min`;
+      if (guide) guide.innerText = data.clinical_guideline;
+      if (badge) {
+        badge.innerText = data.is_safe ? "Safe Titration" : "Dose Alert (> Max)";
+        badge.className = data.is_safe ? "risk-level-badge badge-low" : "risk-level-badge badge-high";
+      }
+    }
+  } catch (err) {
+    console.warn("Infusion calc error:", err);
+  }
+}
+
+function toggleBundleCheck(el) {
+  const cb = el.querySelector('input[type="checkbox"]');
+  if (cb && event.target !== cb) cb.checked = !cb.checked;
+  if (cb.checked) {
+    el.classList.add("checked");
+  } else {
+    el.classList.remove("checked");
+  }
+}
+
+let _bundleSeconds = 3262; // 54m 22s
+setInterval(() => {
+  if (_bundleSeconds > 0) {
+    _bundleSeconds--;
+    const m = Math.floor(_bundleSeconds / 60);
+    const s = _bundleSeconds % 60;
+    const timer = document.getElementById("bundle-timer-display");
+    if (timer) timer.innerText = `00:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')} REMAINING`;
+  }
+}, 1000);
+
+function resetBundleTimer() {
+  _bundleSeconds = 3600;
+}
+
+function recalculateArds() {
+  const pao2 = parseFloat(document.getElementById("calc-pao2-input")?.value || "68");
+  const fio2 = parseFloat(document.getElementById("calc-fio2-input")?.value || "0.60");
+  const pf = pao2 / Math.max(0.01, fio2);
+
+  const pfDisplay = document.getElementById("ards-pf-ratio-val");
+  const badge = document.getElementById("ards-severity-badge");
+  const catText = document.getElementById("ards-category-text");
+
+  if (pfDisplay) pfDisplay.innerText = pf.toFixed(1);
+
+  if (pf < 100) {
+    if (badge) { badge.innerText = "Severe ARDS"; badge.className = "risk-level-badge badge-high"; }
+    if (catText) catText.innerText = "Severe ARDS (P/F ≤ 100 mmHg with PEEP ≥ 5)";
+  } else if (pf <= 200) {
+    if (badge) { badge.innerText = "Moderate ARDS"; badge.className = "risk-level-badge badge-high"; }
+    if (catText) catText.innerText = "Moderate ARDS (100 < P/F ≤ 200 with PEEP ≥ 5)";
+  } else if (pf <= 300) {
+    if (badge) { badge.innerText = "Mild ARDS"; badge.className = "risk-level-badge badge-mod"; }
+    if (catText) catText.innerText = "Mild ARDS (200 < P/F ≤ 300 with PEEP ≥ 5)";
+  } else {
+    if (badge) { badge.innerText = "Normal Oxygenation"; badge.className = "risk-level-badge badge-low"; }
+    if (catText) catText.innerText = "Normal P/F Ratio (> 300 mmHg)";
+  }
+}
+
+// -----------------------------------------------------------------------------
+// NOVELTY 4: VOICE DICTATION & BIOBERT CLINICAL NER
+// -----------------------------------------------------------------------------
+let _voiceRecognition = null;
+let _isVoiceDictating = false;
+
+function toggleVoiceDictation() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert("Speech recognition is not available in your current browser. Please type into the clinical note area.");
+    return;
+  }
+
+  const btn = document.getElementById("voice-dictate-btn");
+  const icon = document.getElementById("voice-mic-icon");
+  const textarea = document.getElementById("pt-notes-input");
+
+  if (_isVoiceDictating) {
+    if (_voiceRecognition) _voiceRecognition.stop();
+    _isVoiceDictating = false;
+    if (btn) btn.style.background = "";
+    if (icon) icon.innerText = "🎤";
+    return;
+  }
+
+  _voiceRecognition = new SpeechRecognition();
+  _voiceRecognition.continuous = true;
+  _voiceRecognition.interimResults = true;
+  _voiceRecognition.lang = "en-US";
+
+  _voiceRecognition.onstart = () => {
+    _isVoiceDictating = true;
+    if (btn) btn.style.background = "rgba(239, 68, 68, 0.25)";
+    if (icon) icon.innerText = "🔴";
+  };
+
+  _voiceRecognition.onresult = (e) => {
+    let interim = "";
+    for (let i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) {
+        textarea.value += (textarea.value ? " " : "") + e.results[i][0].transcript;
+      } else {
+        interim += e.results[i][0].transcript;
+      }
+    }
+  };
+
+  _voiceRecognition.onend = () => {
+    _isVoiceDictating = false;
+    if (btn) btn.style.background = "";
+    if (icon) icon.innerText = "🎤";
+  };
+
+  _voiceRecognition.start();
+}
+
+async function extractBioBertEntities() {
+  const text = document.getElementById("pt-notes-input")?.value || "";
+  const cloud = document.getElementById("biobert-entities-cloud");
+  const container = document.getElementById("ner-chips-container");
+  if (!cloud || !container) return;
+
+  try {
+    const res = await fetch("/clinical/ner", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: text })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      cloud.style.display = "block";
+      if (!data.entities?.length) {
+        container.innerHTML = "<span style='color: var(--muted); font-size: 12px;'>No clinical entities matched in current text.</span>";
+        return;
+      }
+      container.innerHTML = data.entities.map(e => `
+        <span style="background: ${e.color}20; color: ${e.color}; border: 1px solid ${e.color}60; padding: 4px 10px; border-radius: var(--r-pill); font-size: 12px; font-weight: 600;">
+          ${e.text} <small style="opacity: 0.75; font-size: 10px;">(${e.category})</small>
+        </span>
+      `).join("");
+    }
+  } catch (err) {
+    console.warn("NER error:", err);
+  }
+}
+
+async function rescoreWithCurrentNotes() {
+  await analyzePatientRecord();
+  await extractBioBertEntities();
+}
+
+// -----------------------------------------------------------------------------
+// NOVELTY 5: RAPID RESPONSE / CODE BLUE MODAL
+// -----------------------------------------------------------------------------
+function openRapidResponseModal() {
+  const modal = document.getElementById("rapidResponseModal");
+  if (modal) modal.style.display = "flex";
+}
+
+function closeRapidResponseModal() {
+  const modal = document.getElementById("rapidResponseModal");
+  if (modal) modal.style.display = "none";
+}
+
+function confirmDispatchAudio() {
+  closeRapidResponseModal();
+  // Play alert audio
+  if (window.AudioContext || window.webkitAudioContext) {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sawtooth";
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.4);
+      gain.gain.setValueAtTime(0.3, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.45);
+    } catch(e) {}
+  }
+
+  // Speak announcement
+  if (window.speechSynthesis) {
+    const utt = new SpeechSynthesisUtterance("Emergency Rapid Response Team dispatched to Bed 01. Prepare code cart and airway equipment.");
+    utt.rate = 1.05;
+    window.speechSynthesis.speak(utt);
+  }
+}
+
 // Initialize on DOM Ready
 document.addEventListener("DOMContentLoaded", () => {
   initNavbarHighlighting();
@@ -826,5 +1676,10 @@ document.addEventListener("DOMContentLoaded", () => {
   initRealPatientSelector();
   initEdaCharts();
   initRobustnessChart();
+  initLatentSpaceChart();
+  refreshDigitalTwinData();
+  recalculateInfusion();
 });
+
+
 

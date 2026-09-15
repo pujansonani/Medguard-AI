@@ -125,3 +125,56 @@ class DriftBatchResponse(BaseModel):
     prediction_psi: float
     drift_alert: bool
     summary: str
+
+
+class CopilotChatRequest(BaseModel):
+    patient_request: PatientAnalysisRequest
+    prompt: str
+    conversation_history: Optional[List[Dict[str, str]]] = Field(default_factory=list)
+
+
+class CopilotChatResponse(BaseModel):
+    patient_id: int
+    reply: str
+    clinical_rationale: str
+    suggested_orders: List[str]
+    citations: List[str]
+    risk_level: str
+
+
+class OrganDysfunctionResponse(BaseModel):
+    patient_id: int
+    overall_stress_score: float
+    systems: Dict[str, Dict[str, Any]]
+    clinical_pearls: List[str]
+
+
+class InfusionCalcRequest(BaseModel):
+    drug: str = "norepinephrine" # norepinephrine, epinephrine, vasopressin, phenylephrine, dobutamine
+    patient_weight_kg: float = 70.0
+    desired_dose: float = 0.10 # mcg/kg/min or units/min
+    concentration_mg: float = 4.0 # mg in bag
+    bag_volume_ml: float = 250.0 # mL in bag
+
+
+class InfusionCalcResponse(BaseModel):
+    drug: str
+    patient_weight_kg: float
+    desired_dose: float
+    rate_ml_hr: float
+    concentration_mcg_ml: float
+    max_safe_dose: float
+    is_safe: bool
+    clinical_guideline: str
+
+
+class ClinicalNERRequest(BaseModel):
+    text: str
+
+
+class ClinicalNERResponse(BaseModel):
+    original_text: str
+    highlighted_html: str
+    entities: List[Dict[str, str]]
+    summary: str
+
