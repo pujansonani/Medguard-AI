@@ -165,42 +165,46 @@
     </div>
 
     <!-- =========================================================================
-         SECTION 1: HERO & CLINICAL INTELLIGENCE SHOWCASE
+         DR.AI STYLE HERO KV (KEY VISUAL) BANNER
          ========================================================================= -->
-    <section id="portal-home" class="web-section hero-section">
-      <div class="ambient-orb orb-1"></div>
-      <div class="ambient-orb orb-2"></div>
-      <div class="hero-content">
+    <section id="portal-home" class="web-section hero-section in-kv" style="position: relative; overflow: hidden; padding-top: 20px;">
+      <!-- Glowing Ambient Mesh Lights (Dr.AI style) -->
+      <div class="in-light green left"></div>
+      <div class="in-light blue right"></div>
+      <div class="in-light purple ctr"></div>
+
+      <div class="hero-content" style="position: relative; z-index: 2;">
         <div class="hero-eyebrow float-element">
-          Next-Gen Multimodal ICU Intelligence Copilot
+          ✦ Dr.AI Edition — Multimodal ICU Clinical Intelligence Copilot
         </div>
-        <h1 class="hero-title">
-          Predicting ICU Deterioration with <span class="gradient-text">Physiological Waves & Clinical NLP</span>
+        <h1 class="hero-title in_title" style="font-size: 48px; line-height: 1.18; max-width: 960px; margin: 0 auto 18px;">
+          <span class="colorful_text">Borderless Empowering</span><br>
+          Critical Care & ICU Deterioration AI
         </h1>
-        <p class="hero-subtitle">
-          Continuous 24-hour hemodynamic time-series fused with contemporaneous clinical notes for early 48-hour mortality risk forecasting.
+        <p class="hero-subtitle in_text" style="max-width: 860px; margin: 0 auto 28px; font-size: 16px; color: #CBD5E1; line-height: 1.7;">
+          MEDGUARD seamlessly integrates inpatient ICU continuous time-series hemodynamics with contemporaneous unstructured clinical notes. In <a href="#patient-assessment" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">inpatient settings</a>, it incorporates <a href="#patient-assessment" style="color: #3ECFB2; font-weight: 700;">admission notes</a>, progress notes, and vasopressor pharmacotherapy alongside multi-organ digital twin simulations. For <a href="#bedside-copilot" style="color: #A78BFA; font-weight: 700;">decision support</a>, it features <a href="#bedside-copilot" style="color: #F472B6; font-weight: 700;">SBAR voice briefings</a>, BioBERT NER, and automated Sepsis-3 resuscitation pathways.
         </p>
         
-        <div style="display: flex; gap: 14px; justify-content: center; margin-bottom: 36px; flex-wrap: wrap;">
-          <a href="#patient-assessment" class="btn btn-primary">
-            Launch Patient Assessment Studio →
+        <div class="draibtncont">
+          <a href="#patient-assessment" class="draibtn btn-blue">
+            ⚡ Free Start & Patient Assessment
           </a>
-          <a href="#simulation-section" class="btn btn-secondary">
+          <a href="#simulation-section" class="draibtn btn-w line">
             🎬 Watch 24h Deterioration Demo
           </a>
-          <a href="#research-benchmark" class="btn btn-secondary">
-            View Empirical Ablation Results
+          <a href="#research-benchmark" class="draibtn btn-green">
+            🔬 View Empirical Ablation Study
           </a>
         </div>
 
         <!-- LIVE ECG WAVEFORM MONITOR DECK -->
-        <div class="conic-glow-card" style="max-width: 860px; margin: 0 auto 30px;">
+        <div class="conic-glow-card" style="max-width: 900px; margin: 36px auto 20px;">
           <div class="conic-glow-inner" style="padding: 16px 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
               <div style="display: flex; align-items: center; gap: 10px;">
                 <span class="pulse-dot" style="background: #3ECFB2;"></span>
                 <span style="font-size: 13px; font-weight: 700; color: #3ECFB2; letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--font-mono);">
-                  Lead II Telemetry Stream (Live 60 FPS)
+                  Lead II Telemetry Stream (Live 60 FPS • Real MIMIC-IV Cohort)
                 </span>
               </div>
               <div style="display: flex; gap: 16px; font-family: 'Space Mono'; font-size: 13px;">
@@ -218,34 +222,100 @@
         </div>
 
       </div>
+    </section>
 
-      <!-- KPI STATS CARDS -->
-      <div class="hero-stats-grid">
-        <div class="stat-card">
-          <div class="stat-label">Multimodal AUROC</div>
-          <div class="stat-value" data-count="0.952">0.952</div>
-          <div class="stat-sub"><span>▲</span> +0.012 vs Structured Alone</div>
+    <!-- =========================================================================
+         DR.AI STAT COUNTERS SECTION (pf-nbr)
+         ========================================================================= -->
+    <section class="pf-nbr" id="pf-nbr">
+      <div class="nbr-grid">
+        <div class="nbrbox">
+          <div class="nbrbox-nbr colorful_text">0.952</div>
+          <div class="nbrbox-name colorful_text">MULTIMODAL AUROC</div>
+          <div class="nbrbox-subname">Held-out MIMIC-IV cohort discrimination (+0.012 vs structured alone)</div>
         </div>
-
-        <div class="stat-card">
-          <div class="stat-label">Multimodal AUPRC</div>
-          <div class="stat-value" data-count="0.825">0.825</div>
-          <div class="stat-sub"><span>▲</span> High Precision on Rare Outliers</div>
+        <div class="nbrbox">
+          <div class="nbrbox-nbr colorful_text">38</div>
+          <div class="nbrbox-name colorful_text">CLINICAL CONCEPTS</div>
+          <div class="nbrbox-subname">BioBERT Named Entity Recognition & ClinicalBERT Narrative Attributions</div>
         </div>
-
-        <div class="stat-card">
-          <div class="stat-label">Brier Calibration</div>
-          <div class="stat-value" data-count="0.076">0.076</div>
-          <div class="stat-sub" style="color: #FBBF24;">ECE: 0.061 Calibrated</div>
+        <div class="nbrbox">
+          <div class="nbrbox-nbr colorful_text">18</div>
+          <div class="nbrbox-name colorful_text">TELEMETRY STREAMS</div>
+          <div class="nbrbox-subname">Continuous hourly vital waves & laboratory biomarkers monitored</div>
         </div>
-
-        <div class="stat-card">
-          <div class="stat-label">Observation Horizon</div>
-          <div class="stat-value">24h ➔ 48h</div>
-          <div class="stat-sub" style="color: #38BDF8;">Zero Label Leakage</div>
+        <div class="nbrbox">
+          <div class="nbrbox-nbr colorful_text">95<span style="font-size: 24px; color: var(--muted);">/100</span></div>
+          <div class="nbrbox-name colorful_text">CALIBRATION SCORE</div>
+          <div class="nbrbox-subname">Temperature scaled Brier score: 0.076 with Expected Calibration Error: 0.061</div>
         </div>
       </div>
     </section>
+
+    <!-- =========================================================================
+         DR.AI BENTO SHOWCASES (in-ex)
+         ========================================================================= -->
+    <section class="in-ex-section">
+      <div class="in-ex-grid">
+        
+        <!-- Bento 1: For Inpatient ICU Professionals -->
+        <div class="ieb left">
+          <div class="ieb-tag">Inpatient Critical Care</div>
+          <h3 class="ieb-title">Dr.AI for <span class="colorful_text">ICU Professionals</span></h3>
+          <p class="ieb-detail">
+            Empower bedside physicians and intensivists with automated clinical pathways and real-time deterioration forecasting:
+          </p>
+          <ul class="ieb-list">
+            <li><strong>Continuous Hemodynamic Telemetry:</strong> 24h MAP, Heart Rate, Lactate, SpO2 wave tracking.</li>
+            <li><strong>Digital Twin Multi-Organ Mapping:</strong> 6-system stress monitoring (Cardiovascular, Renal, Hepatic).</li>
+            <li><strong>Vasopressor Pharmacotherapy:</strong> Norepinephrine titration & max safe dose guardrails.</li>
+            <li><strong>Autonomous SBAR Audio Briefings:</strong> Voice synthesizable bedside handoff reports.</li>
+          </ul>
+          <div class="draibtncont" style="justify-content: flex-start; margin-top: 16px;">
+            <a href="#patient-assessment" class="draibtn btn-blue">Launch Patient Studio</a>
+            <a href="#organ-dysfunction" class="draibtn btn-w line">Explore Digital Twin</a>
+          </div>
+        </div>
+
+        <!-- Bento 2: For Bedside Clinical Decision Support -->
+        <div class="ieb right">
+          <div class="ieb-tag">Clinical Decision Support</div>
+          <h3 class="ieb-title">Dr.AI for <span class="colorful_text">Autonomous Rounding</span></h3>
+          <p class="ieb-detail">
+            Interactive AI rounding assistant powered by multimodal context, guideline citations, and speech recognition:
+          </p>
+          <ul class="ieb-list">
+            <li><strong>Sepsis-3 Resuscitation Order Set:</strong> Evidence-based fluids, lactate clearance & pressors.</li>
+            <li><strong>What-If Therapeutic Simulator:</strong> Simulate post-intervention risk reduction in real time.</li>
+            <li><strong>PaO2 / FiO2 ARDS Classifier:</strong> Berlin definition severity & lung-protective ventilation.</li>
+            <li><strong>BioBERT Speech Dictation:</strong> Dictate clinical notes with real-time entity recognition.</li>
+          </ul>
+          <div class="draibtncont" style="justify-content: flex-start; margin-top: 16px;">
+            <a href="#bedside-copilot" class="draibtn btn-pur">Open AI Copilot</a>
+            <a href="#counterfactual-simulator" class="draibtn btn-w line">Try What-If Simulator</a>
+          </div>
+        </div>
+
+        <!-- Bento 3: Wide Bottom Box - Medical Exam Center & Ward Command -->
+        <div class="ieb wide">
+          <div class="ieb-tag">Hospital Command Center</div>
+          <h3 class="ieb-title">Dr.AI for <span class="colorful_text">ICU Ward Telemetry & Code Blue Command</span></h3>
+          <p class="ieb-detail" style="max-width: 900px;">
+            Centralized telemetry monitoring for multiple active ICU beds with automated risk triage, Population Stability Index (PSI) drift monitoring, and emergency Rapid Response / Code Blue dispatch team paging.
+          </p>
+          <div class="draibtncont" style="justify-content: flex-start; margin-top: 20px;">
+            <a href="#ward-telemetry" class="draibtn btn-green">View 8-Bed Telemetry Grid</a>
+            <a href="#research-benchmark" class="draibtn btn-w line">Ablation & Fairness Lab</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Floating Dr.AI Quick Copilot Trigger Button -->
+    <a class="fixedbtn" href="#bedside-copilot">
+      <span>🤖</span> Dr.AI Copilot
+    </a>
 
     <!-- =========================================================================
          INTERACTIVE SIMULATION WALKTHROUGH & NEURAL FLOW
@@ -1345,20 +1415,72 @@
     </div>
   </div>
 
-  <!-- FOOTER -->
-  <footer style="border-top: 1px solid var(--border); padding: 48px 0; margin-top: 60px; background: rgba(8, 25, 42, 0.95);">
-    <div class="wrap" style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); flex-wrap: wrap; gap: 16px;">
-      <div>
-        <strong style="color: #fff; font-size: 15px;">MEDGUARD<span style="color: var(--teal);">.</span></strong> — Clinical Intelligence & Multimodal Early Warning Platform.
+  <!-- FOOTER (DR.AI STYLE) -->
+  <footer style="border-top: 1px solid var(--border); padding: 60px 0 36px; margin-top: 80px; background: linear-gradient(180deg, rgba(8, 25, 42, 0.95) 0%, rgba(4, 12, 22, 1) 100%);">
+    <div class="wrap">
+      <div style="display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 40px; margin-bottom: 48px;">
+        <div>
+          <div class="logo-brand" style="margin-bottom: 14px;">
+            <img src="/static/images/logo.png" alt="MEDGUARD AI Logo" class="brand-logo-img" style="height: 36px; width: 36px;">
+            <div>MEDGUARD<span class="dot">.AI</span></div>
+            <span class="nav-version-tag">Dr.AI Edition</span>
+          </div>
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 340px;">
+            Next-generation multimodal ICU deterioration forecasting & autonomous clinical copilot platform. Integrating 24-hour continuous vital waves with contemporaneous clinical narrative documentation.
+          </p>
+          <div style="margin-top: 16px; font-size: 12px; color: var(--teal); font-family: var(--font-mono);">
+            ● PhysioNet MIMIC-IV v2.2 Compatible
+          </div>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; font-family: var(--font-mono); letter-spacing: 0.05em;">Clinical Tools</h4>
+          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--body);">
+            <li><a href="#patient-assessment" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Patient Assessment Studio</a></li>
+            <li><a href="#organ-dysfunction" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Digital Twin Organ Map</a></li>
+            <li><a href="#bedside-copilot" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Bedside AI Copilot</a></li>
+            <li><a href="#counterfactual-simulator" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">What-If Simulator</a></li>
+            <li><a href="#icu-calculators" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">ICU Dosing Calculators</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; font-family: var(--font-mono); letter-spacing: 0.05em;">AI & Research</h4>
+          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--body);">
+            <li><a href="#simulation-section" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">24h Trajectory Replay</a></li>
+            <li><a href="#explainability-studio" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">SHAP Feature Impact</a></li>
+            <li><a href="#explainability-studio" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Cross-Modal Attention</a></li>
+            <li><a href="#research-benchmark" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Ablation Benchmarks</a></li>
+            <li><a href="#fairness-robustness" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Fairness & Drift Audits</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; font-family: var(--font-mono); letter-spacing: 0.05em;">Compliance & APIs</h4>
+          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--body);">
+            <li><a href="/docs" target="_blank" style="color: var(--teal); font-weight: 600;">FastAPI Swagger Docs ↗</a></li>
+            <li><a href="/redoc" target="_blank" style="color: var(--muted);">ReDoc OpenAPI ↗</a></li>
+            <li><span style="color: #64748B;">Apache 2.0 Open License</span></li>
+            <li><span style="color: #64748B;">Research Prototype Only</span></li>
+          </ul>
+        </div>
       </div>
-      <div>
-        PhysioNet MIMIC-IV Schema Compliant • Apache 2.0 License • Research Prototype Only
+
+      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); flex-wrap: wrap; gap: 14px;">
+        <div>
+          © 2026 MEDGUARD.AI | Dr.AI Edition. All Rights Reserved. Not a certified medical device.
+        </div>
+        <div style="display: flex; gap: 20px;">
+          <span>Zero Temporal Leakage Verified</span>
+          <span>Patient-Level Isolation</span>
+          <span>Temperature Calibrated</span>
+        </div>
       </div>
     </div>
   </footer>
 
   <!-- Core JavaScript & Animations -->
-  <script src="/static/js/animations.js?v=2.5"></script>
-  <script src="/static/js/app.js?v=2.5"></script>
+  <script src="/static/js/animations.js?v=2.6"></script>
+  <script src="/static/js/app.js?v=2.6"></script>
 </body>
 </html>

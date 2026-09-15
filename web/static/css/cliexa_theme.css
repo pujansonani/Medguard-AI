@@ -95,56 +95,300 @@ a {
   .container, .wrap { padding: 0 20px; }
 }
 
-/* ===== CLINERA EYEBROWS ===== */
-.eyebrow, .hero-eyebrow {
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--teal);
-  margin-bottom: 20px;
+/* ===== DR.AI AMBIENT GLOWS & LIGHTS ===== */
+.in-light {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.65;
+}
+
+.in-light.green.left {
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(circle, rgba(62, 207, 178, 0.35) 0%, rgba(16, 185, 129, 0.05) 70%, transparent 100%);
+  top: -100px;
+  left: -150px;
+}
+
+.in-light.blue.right {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(59, 130, 246, 0.08) 70%, transparent 100%);
+  top: 50px;
+  right: -150px;
+}
+
+.in-light.purple.ctr {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(167, 139, 250, 0.25) 0%, rgba(139, 92, 246, 0.05) 70%, transparent 100%);
+  top: 40%;
+  left: 30%;
+}
+
+/* ===== DR.AI COLORFUL GRADIENT TEXT ===== */
+.colorful_text {
+  background: linear-gradient(135deg, #00F2FE 0%, #3ECFB2 35%, #A78BFA 70%, #F472B6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.colorful_text_teal {
+  background: linear-gradient(135deg, #3ECFB2 0%, #38BDF8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ===== DR.AI BUTTONS (draibtn) ===== */
+.draibtncont {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.draibtn {
   display: inline-flex;
   align-items: center;
-  gap: 12px;
-  background: var(--teal-glow);
-  border: 1px solid var(--border-teal);
-  padding: 6px 16px;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 12px 28px;
   border-radius: var(--r-pill);
+  cursor: pointer;
+  transition: all 0.25s var(--ease-spring);
+  text-decoration: none;
+  letter-spacing: 0.02em;
 }
 
-.eyebrow::before, .hero-eyebrow::before {
-  content: '';
-  width: 24px;
-  height: 2px;
-  background: currentColor;
-  opacity: 0.6;
+.draibtn.btn-blue {
+  background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+  color: #FFFFFF;
+  border: 1px solid #38BDF8;
+  box-shadow: 0 4px 20px rgba(56, 189, 248, 0.35);
 }
 
-/* ===== NAVIGATION (CLINERA STYLE) ===== */
-.nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1000;
-  background: rgba(15, 43, 70, 0.85);
+.draibtn.btn-blue:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(56, 189, 248, 0.55);
+  background: linear-gradient(135deg, #0369A1 0%, #0284C7 100%);
+}
+
+.draibtn.btn-green {
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+  color: #FFFFFF;
+  border: 1px solid #10B981;
+  box-shadow: 0 4px 20px rgba(16, 185, 129, 0.35);
+}
+
+.draibtn.btn-green:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(16, 185, 129, 0.55);
+}
+
+.draibtn.btn-pur {
+  background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+  color: #FFFFFF;
+  border: 1px solid #A78BFA;
+  box-shadow: 0 4px 20px rgba(167, 139, 250, 0.35);
+}
+
+.draibtn.btn-pur:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(167, 139, 250, 0.55);
+}
+
+.draibtn.btn-w.line {
+  background: rgba(255, 255, 255, 0.04);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+}
+
+.draibtn.btn-w.line:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #FFFFFF;
+  transform: translateY(-2px);
+}
+
+/* ===== DR.AI STAT HIGHLIGHTS (pf-nbr) ===== */
+.pf-nbr {
+  padding: 40px 0 60px;
+  position: relative;
+  z-index: 2;
+}
+
+.nbr-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+.nbrbox {
+  background: linear-gradient(135deg, rgba(21, 50, 80, 0.65) 0%, rgba(8, 25, 42, 0.85) 100%);
+  border: 1px solid var(--border-teal);
+  backdrop-filter: blur(16px);
+  border-radius: var(--r-lg);
+  padding: 32px 24px;
+  text-align: center;
+  transition: all 0.3s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.nbrbox:hover {
+  transform: translateY(-5px);
+  border-color: var(--teal);
+  box-shadow: 0 16px 40px var(--teal-glow-strong);
+}
+
+.nbrbox-nbr {
+  font-family: var(--font-mono);
+  font-size: 52px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.nbrbox-name {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.nbrbox-subname {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+/* ===== DR.AI BENTO SHOWCASES (in-ex) ===== */
+.in-ex-section {
+  padding: 50px 0 70px;
+}
+
+.in-ex-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.ieb {
+  background: linear-gradient(135deg, rgba(21, 50, 80, 0.75) 0%, rgba(10, 22, 40, 0.9) 100%);
+  border: 1px solid var(--border-teal);
+  border-radius: var(--r-lg);
+  padding: 36px 32px;
   backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  transition: all var(--dur-2) var(--ease);
+  transition: all 0.3s var(--ease);
+  position: relative;
+  overflow: hidden;
 }
 
-.nav.scrolled {
-  background: rgba(15, 43, 70, 0.96);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+.ieb:hover {
+  transform: translateY(-4px);
+  border-color: #38BDF8;
+  box-shadow: 0 20px 50px rgba(56, 189, 248, 0.2);
 }
 
-.nav-inner {
+.ieb.wide {
+  grid-column: span 2;
+  background: linear-gradient(135deg, rgba(15, 43, 70, 0.8) 0%, rgba(6, 18, 32, 0.95) 100%);
+}
+
+.ieb-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--teal);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 8px;
+}
+
+.ieb-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 12px;
+  line-height: 1.25;
+}
+
+.ieb-detail {
+  font-size: 14px;
+  color: var(--body);
+  line-height: 1.6;
+}
+
+.ieb-list {
+  list-style: none;
+  margin: 18px 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ieb-list li {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: 76px;
+  gap: 10px;
+  font-size: 14px;
+  color: #E2E8F0;
+}
+
+.ieb-list li::before {
+  content: '✦';
+  color: var(--teal);
+  font-size: 12px;
+}
+
+/* Floating Quick Copilot Trigger Button (Dr.AI style) */
+.fixedbtn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 999;
+  background: linear-gradient(135deg, #0284C7 0%, #0F766E 100%);
+  border: 2px solid var(--teal);
+  box-shadow: 0 8px 30px rgba(62, 207, 178, 0.5);
+  border-radius: var(--r-pill);
+  padding: 12px 20px;
+  color: #FFFFFF;
+  font-weight: 800;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-spring);
+  text-decoration: none;
+  animation: pulse-glow-teal 2.5s infinite;
+}
+
+.fixedbtn:hover {
+  transform: scale(1.06) translateY(-2px);
+  box-shadow: 0 12px 40px rgba(62, 207, 178, 0.75);
+}
+
+@media (max-width: 960px) {
+  .in-ex-grid {
+    grid-template-columns: 1fr;
+  }
+  .ieb.wide {
+    grid-column: span 1;
+  }
 }
 
 .logo-brand, .nav-logo {
