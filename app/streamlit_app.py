@@ -125,16 +125,34 @@ else:
     st.sidebar.markdown("## 🛡️ **MEDGUARD AI**")
     st.sidebar.caption("Multimodal ICU Early Warning Platform")
 
-st.sidebar.markdown(
-    """
-    <div style='background: rgba(56, 189, 248, 0.1); border: 1px solid #0284c7; padding: 10px; border-radius: 8px; margin-bottom: 15px;'>
-        <div style='font-size: 11px; font-weight: 700; color: #38bdf8;'>EXECUTION MODE</div>
-        <div style='font-size: 14px; font-weight: 600; color: #f0f9ff;'>🟡 DEMO / SYNTHETIC COHORT</div>
-        <div style='font-size: 11px; color: #94a3b8; margin-top: 4px;'>MIMIC-IV Schema Compliant</div>
-    </div>
-    """,
-    unsafe_allow_html=True,
+is_mimic_active = (
+    (root_dir / "data" / "raw" / "mimiciv" / "hosp" / "patients.csv.gz").exists()
+    or (root_dir / "data" / "raw" / "mimiciv" / "hosp" / "patients.csv").exists()
+    or (root_dir / "data" / "raw" / "mimiciv" / "icu" / "icustays.csv.gz").exists()
 )
+
+if is_mimic_active:
+    st.sidebar.markdown(
+        """
+        <div style='background: rgba(16, 185, 129, 0.12); border: 1px solid #10b981; padding: 10px; border-radius: 8px; margin-bottom: 15px;'>
+            <div style='font-size: 11px; font-weight: 700; color: #10b981;'>DATASET SOURCE</div>
+            <div style='font-size: 14px; font-weight: 600; color: #f0fdf4;'>🟢 REAL MIMIC-IV (v2.2)</div>
+            <div style='font-size: 11px; color: #86efac; margin-top: 4px;'>PhysioNet Clinical ICU Cohort</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+else:
+    st.sidebar.markdown(
+        """
+        <div style='background: rgba(56, 189, 248, 0.1); border: 1px solid #0284c7; padding: 10px; border-radius: 8px; margin-bottom: 15px;'>
+            <div style='font-size: 11px; font-weight: 700; color: #38bdf8;'>EXECUTION MODE</div>
+            <div style='font-size: 14px; font-weight: 600; color: #f0f9ff;'>🟡 DEMO / SYNTHETIC COHORT</div>
+            <div style='font-size: 11px; color: #94a3b8; margin-top: 4px;'>MIMIC-IV Schema Compliant</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 nav_selection = st.sidebar.radio(
     "Navigation",
