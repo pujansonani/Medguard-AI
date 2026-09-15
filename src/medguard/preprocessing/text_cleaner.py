@@ -91,8 +91,14 @@ class ClinicalTextPreprocessor:
         cutoff = max_cutoff_hour if max_cutoff_hour is not None else self.obs_window_hours
         result: Dict[int, str] = {}
         
+        if df_notes is None or df_notes.empty or "stay_id" not in df_notes.columns:
+            return {sid: "No clinical notes documented." for sid in stay_ids}
+
         # Apply global filters first with appropriate cutoff
         valid_notes = self.filter_notes_for_stay(df_notes, max_cutoff_hour=cutoff)
+        if valid_notes.empty or "stay_id" not in valid_notes.columns:
+            return {sid: "No clinical notes documented." for sid in stay_ids}
+
         grouped = valid_notes.groupby("stay_id")
 
         for sid in stay_ids:

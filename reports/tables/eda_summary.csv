@@ -1,8 +1,8 @@
 Metric,Value
-Total Cohort ICU Stays,600
-Unique Patients,600
-48h In-Hospital Mortality Rate,25.17%
-Mean Patient Age (Std),64.5 ± 13.5 yrs
-Male Patient Fraction,54.7%
+Total Cohort ICU Stays,85
+Unique Patients,85
+48h In-Hospital Mortality Rate,1.18%
+Mean Patient Age (Std),61.9 ± 16.9 yrs
+Male Patient Fraction,54.1%
 Total 24h Notes Available,"1,834"
-Mean Notes per Stay,3.06
+Mean Notes per Stay,21.58

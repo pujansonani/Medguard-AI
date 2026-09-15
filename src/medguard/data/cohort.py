@@ -79,26 +79,55 @@ def split_cohort_patient_level(
     
     patients = np.array(patient_df[patient_col].tolist())
     labels = np.array(patient_df[stratify_col].tolist())
+
+    # When positive cases are very rare (< 3), manually distribute them so train gets at least 1 positive case
+    pos_patients = patients[labels == 1]
+    neg_patients = patients[labels == 0]
     
-    # First split: Train vs Temp (Val + Test)
-    temp_ratio = val_ratio + test_ratio
-    p_train, p_temp, y_train, y_temp = train_test_split(
-        patients,
-        labels,
-        test_size=temp_ratio,
-        random_state=seed,
-        stratify=labels if len(np.unique(labels)) > 1 else None,
-    )
-    
-    # Second split: Val vs Test
-    val_rel_ratio = val_ratio / temp_ratio
-    p_val, p_test, _, _ = train_test_split(
-        p_temp,
-        y_temp,
-        test_size=(1.0 - val_rel_ratio),
-        random_state=seed,
-        stratify=y_temp if len(np.unique(y_temp)) > 1 else None,
-    )
+    if 0 < len(pos_patients) < 3:
+        # Guarantee training gets positive instance
+        rng = np.random.RandomState(seed)
+        shuffled_pos = rng.permutation(pos_patients)
+        shuffled_neg = rng.permutation(neg_patients)
+        
+        n_neg = len(shuffled_neg)
+        n_neg_train = int(np.round(n_neg * train_ratio))
+        n_neg_val = int(np.round(n_neg * val_ratio))
+        
+        p_train = np.concatenate([shuffled_pos[:1], shuffled_neg[:n_neg_train]])
+        if len(shuffled_pos) > 1:
+            p_val = np.concatenate([shuffled_pos[1:2], shuffled_neg[n_neg_train:n_neg_train + n_neg_val]])
+            p_test = shuffled_neg[n_neg_train + n_neg_val:]
+        else:
+            p_val = shuffled_neg[n_neg_train:n_neg_train + n_neg_val]
+            p_test = shuffled_neg[n_neg_train + n_neg_val:]
+    else:
+        # Determine if stratification is possible (each class must have >= 2 instances for 2-way split)
+        unique_labels, label_counts = np.unique(labels, return_counts=True)
+        can_stratify_1 = len(unique_labels) > 1 and np.min(label_counts) >= 2
+
+        # First split: Train vs Temp (Val + Test)
+        temp_ratio = val_ratio + test_ratio
+        p_train, p_temp, y_train, y_temp = train_test_split(
+            patients,
+            labels,
+            test_size=temp_ratio,
+            random_state=seed,
+            stratify=labels if can_stratify_1 else None,
+        )
+        
+        # Second split: Val vs Test
+        val_rel_ratio = val_ratio / temp_ratio
+        unique_temp_labels, temp_label_counts = np.unique(y_temp, return_counts=True)
+        can_stratify_2 = len(unique_temp_labels) > 1 and np.min(temp_label_counts) >= 2
+
+        p_val, p_test, _, _ = train_test_split(
+            p_temp,
+            y_temp,
+            test_size=(1.0 - val_rel_ratio),
+            random_state=seed,
+            stratify=y_temp if can_stratify_2 else None,
+        )
     
     df_train = df[df[patient_col].isin(set(p_train))].copy().reset_index(drop=True)
     df_val = df[df[patient_col].isin(set(p_val))].copy().reset_index(drop=True)

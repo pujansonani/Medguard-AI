@@ -1,8 +1,8 @@
 {
   "model_name": "ClinicalNLPModel",
   "version": "0.1.0",
-  "training_timestamp": "2026-09-14T12:16:12.329765+00:00",
-  "git_commit": "cb8d14f",
+  "training_timestamp": "2026-09-15T03:52:57.384372+00:00",
+  "git_commit": "1ab1991",
   "dataset_version": "v0.1.0",
   "configuration": {
     "embedding_dim": 128,

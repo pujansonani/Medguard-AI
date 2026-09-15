@@ -1,11 +1,5 @@
 Category,Subgroup,Sample_Count,Mortality_Rate,AUROC,AUPRC,F1,Brier
-age_group,Age < 65,0,0.2,0.0,0.0,0.0,0.0
-age_group,Age >= 65,0,0.28,0.0,0.0,0.0,0.0
-gender,F,0,0.222,0.0,0.0,0.0,0.0
-gender,M,0,0.267,0.0,0.0,0.0,0.0
-icu_type,CCU,0,0.0,0.0,0.0,0.0,0.0
-icu_type,CVICU,0,0.182,0.0,0.0,0.0,0.0
-icu_type,MICU,0,0.316,0.0,0.0,0.0,0.0
-icu_type,Neuro ICU,0,0.333,0.0,0.0,0.0,0.0
-icu_type,SICU,0,0.2,0.0,0.0,0.0,0.0
-icu_type,TSICU,0,0.4,0.0,0.0,0.0,0.0
+age_group,Age < 65,0,0.0,0.0,0.0,0.0,0.0
+age_group,Age >= 65,0,0.0,0.0,0.0,0.0,0.0
+gender,F,0,0.0,0.0,0.0,0.0,0.0
+gender,M,0,0.0,0.0,0.0,0.0,0.0

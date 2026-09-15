@@ -54,7 +54,15 @@ class LogisticRegressionBaseline(StructuredModel):
 
         y_arr = np.array(y).ravel()
         X_scaled = self.scaler.fit_transform(X_arr)
-        self.clf.fit(X_scaled, y_arr)
+        if len(np.unique(y_arr)) < 2:
+            # Edge case: If training slice has only 1 class, add a dummy opposite row to allow fitting
+            dummy_y = 1 - y_arr[0]
+            dummy_X = np.zeros((1, X_scaled.shape[1]))
+            X_fit = np.vstack([X_scaled, dummy_X])
+            y_fit = np.append(y_arr, dummy_y)
+            self.clf.fit(X_fit, y_fit)
+        else:
+            self.clf.fit(X_scaled, y_arr)
         self.is_fitted = True
         return self
 
@@ -123,7 +131,14 @@ class XGBoostBaseline(StructuredModel):
             self.feature_names_ = [f"feat_{i}" for i in range(X_arr.shape[1])]
 
         y_arr = np.array(y).ravel()
-        self.clf.fit(X_arr, y_arr)
+        if len(np.unique(y_arr)) < 2:
+            dummy_y = 1 - y_arr[0]
+            dummy_X = np.zeros((1, X_arr.shape[1]))
+            X_fit = np.vstack([X_arr, dummy_X])
+            y_fit = np.append(y_arr, dummy_y)
+            self.clf.fit(X_fit, y_fit)
+        else:
+            self.clf.fit(X_arr, y_arr)
         self.is_fitted = True
         return self
 

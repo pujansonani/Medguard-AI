@@ -1,17 +1,22 @@
 {
-  "initial_icu_stays": 600,
-  "final_cohort_stays": 600,
-  "mortality_count": 151,
-  "survival_count": 449,
-  "mortality_rate": 0.2517,
-  "age_mean": 64.49,
-  "age_std": 13.51,
+  "initial_icu_stays": 140,
+  "excluded_pediatric": 0,
+  "excluded_repeat_stays": 40,
+  "excluded_los_under_24h": 15,
+  "final_cohort_stays": 85,
+  "mortality_count": 1,
+  "survival_count": 84,
+  "mortality_rate": 0.0118,
+  "age_mean": 61.87,
+  "age_std": 16.91,
   "icu_type_distribution": {
-    "MICU": 223,
-    "SICU": 116,
-    "CVICU": 85,
-    "CCU": 77,
-    "TSICU": 60,
-    "Neuro ICU": 39
+    "Cardiac Vascular Intensive Care Unit (CVICU)": 24,
+    "Surgical Intensive Care Unit (SICU)": 16,
+    "Medical Intensive Care Unit (MICU)": 13,
+    "Medical/Surgical Intensive Care Unit (MICU/SICU)": 12,
+    "Trauma SICU (TSICU)": 10,
+    "Coronary Care Unit (CCU)": 7,
+    "Neuro Surgical Intensive Care Unit (Neuro SICU)": 2,
+    "Neuro Stepdown": 1
   }
 }
