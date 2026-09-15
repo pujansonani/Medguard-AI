@@ -1423,3 +1423,82 @@ a {
   to { transform: scale(1); opacity: 1; }
 }
 
+/* ==============================================================================
+   DR.AI HOSPITAL VIDEO SUITE & AMBIENT HERO VIDEO
+   ============================================================================== */
+
+.hero-bg-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  opacity: 0.16;
+  filter: saturate(0.75) contrast(1.15) brightness(0.65);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.hospital-video-theater {
+  margin: 40px 0;
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-teal);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 30px var(--teal-glow);
+  background: #000000;
+}
+
+.hospital-video-player {
+  width: 100%;
+  height: 480px;
+  object-fit: cover;
+  display: block;
+}
+
+.hospital-video-overlay-hud {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hospital-video-hud-tag {
+  background: rgba(8, 25, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-teal);
+  padding: 6px 14px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--teal);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hospital-video-controls-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 24px;
+  background: linear-gradient(180deg, transparent 0%, rgba(4, 12, 22, 0.95) 100%);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+

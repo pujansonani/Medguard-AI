@@ -165,9 +165,14 @@
     </div>
 
     <!-- =========================================================================
-         DR.AI STYLE HERO KV (KEY VISUAL) BANNER
+         DR.AI STYLE HERO KV (KEY VISUAL) BANNER WITH AMBIENT HOSPITAL VIDEO
          ========================================================================= -->
     <section id="portal-home" class="web-section hero-section in-kv" style="position: relative; overflow: hidden; padding-top: 20px;">
+      <!-- Cinematic Ambient Looping Hospital Video Background -->
+      <video autoplay loop muted playsinline class="hero-bg-video" id="heroAmbientVideo">
+        <source src="/static/videos/hospital_icu_ambient.mp4" type="video/mp4">
+      </video>
+
       <!-- Glowing Ambient Mesh Lights (Dr.AI style) -->
       <div class="in-light green left"></div>
       <div class="in-light blue right"></div>
@@ -189,8 +194,11 @@
           <a href="#patient-assessment" class="draibtn btn-blue">
             ⚡ Free Start & Patient Assessment
           </a>
+          <a href="#hospital-video-showcase" class="draibtn btn-w line">
+            📹 Hospital ICU Video Tour
+          </a>
           <a href="#simulation-section" class="draibtn btn-w line">
-            🎬 Watch 24h Deterioration Demo
+            🎬 24h Deterioration Demo
           </a>
           <a href="#research-benchmark" class="draibtn btn-green">
             🔬 View Empirical Ablation Study
@@ -309,6 +317,83 @@
           </div>
         </div>
 
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         DR.AI STYLE HOSPITAL ICU VIDEO THEATER & LIVE CLINICAL DEPLOYMENT (in-why)
+         ========================================================================= -->
+    <section id="hospital-video-showcase" class="web-section">
+      <div class="panel-card" style="background: linear-gradient(135deg, rgba(15, 43, 70, 0.85) 0%, rgba(6, 18, 32, 0.95) 100%);">
+        <div class="panel-header" style="flex-wrap: wrap; gap: 14px;">
+          <div>
+            <div class="hero-eyebrow" style="margin-bottom: 6px;">📹 Hospital Clinical Intelligence Showcase</div>
+            <h3 class="panel-title">A New Dawn in Medical Care — Empowering Intensive Care Units</h3>
+            <div class="panel-subtitle">Live hospital ICU monitoring environment powered by MEDGUARD Multimodal Clinical AI</div>
+          </div>
+          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <label class="btn btn-secondary" style="padding: 8px 14px; font-size: 12px; cursor: pointer;">
+              📂 Load Custom Hospital Video
+              <input type="file" accept="video/*" style="display: none;" onchange="loadCustomHospitalVideo(event)">
+            </label>
+            <button id="hospitalVideoPlayBtn" class="btn btn-primary" style="padding: 8px 18px; font-size: 13px;" onclick="toggleHospitalVideo()">
+              ▶ Play Video
+            </button>
+          </div>
+        </div>
+
+        <div class="hospital-video-theater">
+          <!-- Top HUD Overlay -->
+          <div class="hospital-video-overlay-hud">
+            <div class="hospital-video-hud-tag">
+              <span class="pulse-dot" style="background: #10B981;"></span>
+              <span>ICU WARD A • TELEMETRY FEED ACTIVE</span>
+            </div>
+            <div class="hospital-video-hud-tag" style="border-color: #38BDF8; color: #38BDF8;">
+              <span>HD 1080p • 25 FPS HOSPITAL STREAM</span>
+            </div>
+          </div>
+
+          <!-- Video Player -->
+          <video id="hospitalMainVideo" class="hospital-video-player" loop playsinline preload="auto">
+            <source src="/static/videos/hospital_icu_ambient.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+
+          <!-- Bottom Controls Bar -->
+          <div class="hospital-video-controls-bar">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleHospitalVideo()">
+                <span id="hospitalVideoBtnLabel">▶ Play</span>
+              </button>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleHospitalAudio()">
+                <span id="hospitalAudioBtnLabel">🔇 Unmute</span>
+              </button>
+              <span id="hospitalVideoTime" style="font-family: var(--font-mono); font-size: 12px; color: var(--muted);">00:00 / 00:00</span>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center;">
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="setHospitalVideoSpeed(1)">1x</button>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="setHospitalVideoSpeed(1.5)">1.5x</button>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="setHospitalVideoSpeed(2)">2x</button>
+              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleHospitalFullscreen()">⛶ Fullscreen</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px;">
+          <div style="background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 8px; border-left: 3px solid #38BDF8;">
+            <div style="font-size: 11px; font-weight: 800; color: #38BDF8; text-transform: uppercase;">Continuous ICU Vigilance</div>
+            <div style="font-size: 12px; color: #CBD5E1; margin-top: 2px;">Automated 24h surveillance across bedside hemodynamic monitors.</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 8px; border-left: 3px solid #3ECFB2;">
+            <div style="font-size: 11px; font-weight: 800; color: #3ECFB2; text-transform: uppercase;">Early Warning Trigger</div>
+            <div style="font-size: 12px; color: #CBD5E1; margin-top: 2px;">Forecasts acute deterioration 48 hours prior to clinical decompensation.</div>
+          </div>
+          <div style="background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 8px; border-left: 3px solid #A78BFA;">
+            <div style="font-size: 11px; font-weight: 800; color: #A78BFA; text-transform: uppercase;">Multimodal Synthesis</div>
+            <div style="font-size: 12px; color: #CBD5E1; margin-top: 2px;">Fuses continuous wave vitals with contemporaneous physician notes.</div>
+          </div>
+        </div>
       </div>
     </section>
 

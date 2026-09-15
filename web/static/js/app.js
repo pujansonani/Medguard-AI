@@ -1716,6 +1716,7 @@ function initNavbarHighlighting() {
     const scrollPos = window.scrollY + 120;
     const sections = [
       { id: 'portal-home', group: 'nav-portal-home' },
+      { id: 'hospital-video-showcase', group: 'nav-portal-home' },
       { id: 'patient-assessment', group: 'nav-group-clinical' },
       { id: 'organ-dysfunction', group: 'nav-group-clinical' },
       { id: 'bedside-copilot', group: 'nav-group-clinical' },
@@ -1750,9 +1751,112 @@ function initNavbarHighlighting() {
   });
 }
 
+// =========================================================================
+// HOSPITAL VIDEO THEATER & AMBIENT PLAYBACK CONTROLS
+// =========================================================================
+
+function formatVideoTime(seconds) {
+  if (isNaN(seconds) || seconds === null) return "00:00";
+  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const s = Math.floor(seconds % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function initHospitalVideoEvents() {
+  const video = document.getElementById("hospitalMainVideo");
+  if (!video) return;
+
+  video.addEventListener("timeupdate", () => {
+    const timeDisplay = document.getElementById("hospitalVideoTime");
+    if (timeDisplay) {
+      timeDisplay.innerText = `${formatVideoTime(video.currentTime)} / ${formatVideoTime(video.duration || 0)}`;
+    }
+  });
+
+  video.addEventListener("play", () => {
+    const btnLabel = document.getElementById("hospitalVideoBtnLabel");
+    const playBtn = document.getElementById("hospitalVideoPlayBtn");
+    if (btnLabel) btnLabel.innerText = "⏸ Pause";
+    if (playBtn) playBtn.innerText = "⏸ Pause Video";
+  });
+
+  video.addEventListener("pause", () => {
+    const btnLabel = document.getElementById("hospitalVideoBtnLabel");
+    const playBtn = document.getElementById("hospitalVideoPlayBtn");
+    if (btnLabel) btnLabel.innerText = "▶ Play";
+    if (playBtn) playBtn.innerText = "▶ Play Video";
+  });
+}
+
+function toggleHospitalVideo() {
+  const video = document.getElementById("hospitalMainVideo");
+  if (!video) return;
+
+  if (video.paused || video.ended) {
+    video.play().catch(e => {
+      console.warn("Video play error (needs user gesture):", e);
+    });
+  } else {
+    video.pause();
+  }
+}
+
+function toggleHospitalAudio() {
+  const video = document.getElementById("hospitalMainVideo");
+  const audioBtnLabel = document.getElementById("hospitalAudioBtnLabel");
+  if (!video) return;
+
+  video.muted = !video.muted;
+  if (audioBtnLabel) {
+    audioBtnLabel.innerText = video.muted ? "🔇 Unmute" : "🔊 Mute";
+  }
+}
+
+function setHospitalVideoSpeed(speed) {
+  const video = document.getElementById("hospitalMainVideo");
+  if (!video) return;
+  video.playbackRate = speed;
+}
+
+function toggleHospitalFullscreen() {
+  const video = document.getElementById("hospitalMainVideo");
+  if (!video) return;
+
+  if (document.fullscreenElement) {
+    document.exitFullscreen();
+  } else {
+    if (video.requestFullscreen) {
+      video.requestFullscreen();
+    } else if (video.webkitRequestFullscreen) {
+      video.webkitRequestFullscreen();
+    } else if (video.msRequestFullscreen) {
+      video.msRequestFullscreen();
+    }
+  }
+}
+
+function loadCustomHospitalVideo(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  const mainVideo = document.getElementById("hospitalMainVideo");
+  const heroVideo = document.getElementById("heroAmbientVideo");
+
+  if (mainVideo) {
+    mainVideo.src = url;
+    mainVideo.play().catch(e => console.warn(e));
+  }
+  if (heroVideo) {
+    heroVideo.src = url;
+    heroVideo.play().catch(e => console.warn(e));
+  }
+}
+
 // Initialize on DOM Ready
 document.addEventListener("DOMContentLoaded", () => {
   initNavbarHighlighting();
+  initHospitalVideoEvents();
   loadPatientCase("sepsis_shock");
   renderWardBeds();
   loadEvaluationBenchmark();
