@@ -1667,6 +1667,89 @@ function confirmDispatchAudio() {
   }
 }
 
+// -----------------------------------------------------------------------------
+// NOVELTY: MODERN GROUPED NAVBAR INTERACTION & SCROLL SPY
+// -----------------------------------------------------------------------------
+function initNavbarHighlighting() {
+  // Dropdown click toggle for mouse/touch
+  document.querySelectorAll('.nav-dropdown-trigger').forEach(trigger => {
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const parent = trigger.closest('.nav-dropdown');
+      const wasOpen = parent.classList.contains('open');
+      document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+      if (!wasOpen) parent.classList.add('open');
+    });
+  });
+
+  // Close dropdowns on outside click
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+  });
+
+  // Smooth scrolling for dropdown links with sticky navbar offset
+  document.querySelectorAll('.nav-dropdown-item, .nav-item-link, .nav-quick-assess-btn').forEach(link => {
+    link.addEventListener('click', (e) => {
+      // Close all dropdowns
+      document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+
+      const targetId = link.getAttribute('href');
+      if (targetId && targetId.startsWith('#')) {
+        const targetEl = document.querySelector(targetId);
+        if (targetEl) {
+          e.preventDefault();
+          const headerOffset = 85;
+          const elementPosition = targetEl.getBoundingClientRect().top;
+          const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+          window.scrollTo({
+            top: offsetPosition,
+            behavior: "smooth"
+          });
+        }
+      }
+    });
+  });
+
+  // Scroll spy to highlight active menu section
+  window.addEventListener('scroll', () => {
+    const scrollPos = window.scrollY + 120;
+    const sections = [
+      { id: 'portal-home', group: 'nav-portal-home' },
+      { id: 'patient-assessment', group: 'nav-group-clinical' },
+      { id: 'organ-dysfunction', group: 'nav-group-clinical' },
+      { id: 'bedside-copilot', group: 'nav-group-clinical' },
+      { id: 'counterfactual-simulator', group: 'nav-group-clinical' },
+      { id: 'icu-calculators', group: 'nav-group-clinical' },
+      { id: 'simulation-section', group: 'nav-group-research' },
+      { id: 'explainability-studio', group: 'nav-group-research' },
+      { id: 'research-benchmark', group: 'nav-group-research' },
+      { id: 'cohort-eda', group: 'nav-group-ward' },
+      { id: 'fairness-robustness', group: 'nav-group-ward' },
+      { id: 'ward-telemetry', group: 'nav-group-ward' }
+    ];
+
+    let currentGroup = 'nav-portal-home';
+    for (const sec of sections) {
+      const el = document.getElementById(sec.id);
+      if (el && el.offsetTop <= scrollPos) {
+        currentGroup = sec.group;
+      }
+    }
+
+    // Reset active states
+    document.querySelectorAll('.nav-item-link, .nav-dropdown-trigger').forEach(btn => {
+      btn.classList.remove('active');
+    });
+
+    // Set active
+    const activeBtn = document.getElementById(currentGroup);
+    if (activeBtn) {
+      activeBtn.classList.add('active');
+    }
+  });
+}
+
 // Initialize on DOM Ready
 document.addEventListener("DOMContentLoaded", () => {
   initNavbarHighlighting();

@@ -14,8 +14,8 @@
   <script src="/static/js/chart.umd.min.js"></script>
   
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="/static/css/cliexa_theme.css">
-  <link rel="stylesheet" href="/static/css/animations.css">
+  <link rel="stylesheet" href="/static/css/cliexa_theme.css?v=2.5">
+  <link rel="stylesheet" href="/static/css/animations.css?v=2.5">
 </head>
 <body class="ambient-matrix-bg">
 
@@ -27,45 +27,117 @@
       <div class="logo-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
         <img src="/static/images/logo.png" alt="MEDGUARD AI Logo" class="brand-logo-img" style="height: 36px; width: 36px; object-fit: contain; border-radius: 6px; box-shadow: 0 2px 8px rgba(62,207,178,0.25);">
         <div>MEDGUARD<span class="dot">.AI</span></div>
+        <span class="nav-version-tag">v2.4 ICU</span>
       </div>
 
-      <div class="nav-tabs-bar">
-        <a href="#portal-home" class="nav-tab-btn active" id="nav-portal-home">
+      <div class="nav-menu">
+        <a href="#portal-home" class="nav-item-link active" id="nav-portal-home">
           <span>📊</span> Overview
         </a>
-        <a href="#simulation-section" class="nav-tab-btn" id="nav-simulation-section">
-          <span>🎬</span> Simulation
-        </a>
-        <a href="#patient-assessment" class="nav-tab-btn" id="nav-patient-assessment">
-          <span>🩺</span> Assessment
-        </a>
-        <a href="#organ-dysfunction" class="nav-tab-btn" id="nav-organ-dysfunction">
-          <span>🫀</span> Digital Twin
-        </a>
-        <a href="#bedside-copilot" class="nav-tab-btn" id="nav-bedside-copilot">
-          <span>🤖</span> AI Copilot
-        </a>
-        <a href="#counterfactual-simulator" class="nav-tab-btn" id="nav-counterfactual-simulator">
-          <span>💊</span> What-If
-        </a>
-        <a href="#icu-calculators" class="nav-tab-btn" id="nav-icu-calculators">
-          <span>🧮</span> Calculators
-        </a>
-        <a href="#explainability-studio" class="nav-tab-btn" id="nav-explainability-studio">
-          <span>🔍</span> Explainability
-        </a>
-        <a href="#research-benchmark" class="nav-tab-btn" id="nav-research-benchmark">
-          <span>🔬</span> Benchmark
-        </a>
-        <a href="#cohort-eda" class="nav-tab-btn" id="nav-cohort-eda">
-          <span>📈</span> Cohort EDA
-        </a>
-        <a href="#fairness-robustness" class="nav-tab-btn" id="nav-fairness-robustness">
-          <span>⚖️</span> Fairness
-        </a>
-        <a href="#ward-telemetry" class="nav-tab-btn" id="nav-ward-telemetry">
-          <span>🏥</span> Ward
-        </a>
+
+        <!-- Dropdown 1: Clinical Suite -->
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-trigger" id="nav-group-clinical">
+            <span>🩺</span> Clinical Suite <span class="chevron-arrow">▾</span>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="#patient-assessment" class="nav-dropdown-item">
+              <div class="nav-dd-icon">🩺</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">Patient Assessment Studio</div>
+                <div class="nav-dd-sub">Real-time vitals, uncertainty & 48h risk</div>
+              </div>
+            </a>
+            <a href="#organ-dysfunction" class="nav-dropdown-item">
+              <div class="nav-dd-icon">🫀</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">Digital Twin Organ Map</div>
+                <div class="nav-dd-sub">6-system organ stress & SOFA scoring</div>
+              </div>
+            </a>
+            <a href="#bedside-copilot" class="nav-dropdown-item">
+              <div class="nav-dd-icon">🤖</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">Bedside AI Copilot</div>
+                <div class="nav-dd-sub">Sepsis orders & conversational rounds</div>
+              </div>
+            </a>
+            <a href="#counterfactual-simulator" class="nav-dropdown-item">
+              <div class="nav-dd-icon">💊</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">What-If Therapeutic Simulator</div>
+                <div class="nav-dd-sub">Pressor & fluid trajectory simulation</div>
+              </div>
+            </a>
+            <a href="#icu-calculators" class="nav-dropdown-item">
+              <div class="nav-dd-icon">🧮</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">ICU Infusion Calculators</div>
+                <div class="nav-dd-sub">Dosing rates, SSC bundle & ARDS P/F</div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Dropdown 2: AI & Research -->
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-trigger" id="nav-group-research">
+            <span>🧠</span> AI & Research <span class="chevron-arrow">▾</span>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="#simulation-section" class="nav-dropdown-item">
+              <div class="nav-dd-icon">🎬</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">24h Simulation Walkthrough</div>
+                <div class="nav-dd-sub">Hour-by-hour deterioration replay</div>
+              </div>
+            </a>
+            <a href="#explainability-studio" class="nav-dropdown-item">
+              <div class="nav-dd-icon">🔍</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">Explainability & SHAP Studio</div>
+                <div class="nav-dd-sub">Cross-modal attention & latent 2D PCA</div>
+              </div>
+            </a>
+            <a href="#research-benchmark" class="nav-dropdown-item">
+              <div class="nav-dd-icon">🔬</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">Research Benchmarks</div>
+                <div class="nav-dd-sub">Ablation study & multimodal metrics</div>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        <!-- Dropdown 3: Analytics & Ward -->
+        <div class="nav-dropdown">
+          <button class="nav-dropdown-trigger" id="nav-group-ward">
+            <span>🏥</span> Analytics & Ward <span class="chevron-arrow">▾</span>
+          </button>
+          <div class="nav-dropdown-menu">
+            <a href="#cohort-eda" class="nav-dropdown-item">
+              <div class="nav-dd-icon">📈</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">MIMIC-IV Cohort EDA</div>
+                <div class="nav-dd-sub">18 stream missingness & trajectories</div>
+              </div>
+            </a>
+            <a href="#fairness-robustness" class="nav-dropdown-item">
+              <div class="nav-dd-icon">⚖️</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">Subgroup Fairness & Robustness</div>
+                <div class="nav-dd-sub">Demographic parity & sensor dropout</div>
+              </div>
+            </a>
+            <a href="#ward-telemetry" class="nav-dropdown-item">
+              <div class="nav-dd-icon">🏥</div>
+              <div class="nav-dd-content">
+                <div class="nav-dd-title">ICU Ward Telemetry Grid</div>
+                <div class="nav-dd-sub">Bedside monitors & Code Blue dispatch</div>
+              </div>
+            </a>
+          </div>
+        </div>
       </div>
 
       <div class="nav-right-actions">
@@ -73,8 +145,8 @@
           <span class="pulse-dot" style="background: #10B981;"></span>
           <span id="dataset-status-text">MIMIC-IV Connected</span>
         </div>
-        <a href="/docs" target="_blank" class="btn btn-secondary" style="padding: 7px 14px; font-size: 13px;">
-          API Docs ↗
+        <a href="#patient-assessment" class="btn btn-primary nav-quick-assess-btn">
+          ⚡ Launch Copilot
         </a>
       </div>
     </div>
@@ -1286,7 +1358,7 @@
   </footer>
 
   <!-- Core JavaScript & Animations -->
-  <script src="/static/js/animations.js"></script>
-  <script src="/static/js/app.js"></script>
+  <script src="/static/js/animations.js?v=2.5"></script>
+  <script src="/static/js/app.js?v=2.5"></script>
 </body>
 </html>
