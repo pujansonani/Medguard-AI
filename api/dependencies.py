@@ -15,7 +15,7 @@ from medguard.models.temporal_nn import TemporalGRUModel
 from medguard.models.clinical_nlp import ClinicalNLPModel
 from medguard.models.fusion import MedguardMultimodalModel
 from medguard.calibration.temperature_scaling import TemperatureScaler
-from medguard.explainability.shap_explainer import MedguardSHAPExplainer
+# from medguard.explainability.shap_explainer import MedguardSHAPExplainer (lazy loaded)
 from medguard.explainability.text_attribution import TextAttributionHighlighter
 from medguard.preprocessing.time_series import FEATURE_COLUMNS
 from medguard.utils.config import get_project_root, load_all_configs
@@ -41,7 +41,7 @@ class ModelService:
         self.xgb_model: Optional[XGBoostBaseline] = None
         self.nlp_model: Optional[ClinicalNLPModel] = None
         self.calibrator: Optional[TemperatureScaler] = None
-        self.shap_explainer: Optional[MedguardSHAPExplainer] = None
+        self.shap_explainer: Optional[Any] = None
         self.evaluation_results: Dict[str, Any] = {}
         self.is_loaded = False
 
@@ -86,9 +86,13 @@ class ModelService:
 
         # 6. SHAP Explainer
         if self.xgb_model is not None and (self.proc_dir / "df_tab_train.parquet").exists():
-            df_bg = pd.read_parquet(self.proc_dir / "df_tab_train.parquet")
-            self.shap_explainer = MedguardSHAPExplainer(self.xgb_model, df_bg)
-            logger.info("Initialized SHAP Explainer.")
+            try:
+                from medguard.explainability.shap_explainer import MedguardSHAPExplainer
+                df_bg = pd.read_parquet(self.proc_dir / "df_tab_train.parquet")
+                self.shap_explainer = MedguardSHAPExplainer(self.xgb_model, df_bg)
+                logger.info("Initialized SHAP Explainer.")
+            except Exception as e:
+                logger.warning(f"SHAP initialization deferred: {e}")
 
         # 7. Evaluation results
         eval_path = self.exp_dir / "evaluation_results.json"

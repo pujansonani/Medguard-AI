@@ -2,1570 +2,807 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>MEDGUARD AI — Multimodal Clinical Intelligence Platform</title>
-  
-  <!-- Google Fonts: Plus Jakarta Sans & Space Mono (Clinera AI Typography) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  
-  <!-- Local Chart.js for 100% offline reliability -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MEDGUARD AI — ICU Deterioration & 48-Hour Mortality Risk Score</title>
+  <meta name="description" content="Evidence-based, multimodal ICU mortality risk calculator. MDCalc-style clinical decision support powered by deep learning on MIMIC-IV data.">
+  <meta name="theme-color" content="#0f1f3d">
+
+  <!-- Chart.js (bundled) -->
   <script src="/static/js/chart.umd.min.js"></script>
-  
-  <!-- Stylesheets -->
-  <link rel="stylesheet" href="/static/css/cliexa_theme.css?v=2.5">
-  <link rel="stylesheet" href="/static/css/animations.css?v=2.5">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="/static/css/mediguard.css">
 </head>
-<body class="ambient-matrix-bg">
+<body>
 
-  <!-- =========================================================================
-       NAVIGATION BAR
-       ========================================================================= -->
-  <nav class="nav">
-    <div class="wrap nav-inner">
-      <div class="logo-brand" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
-        <img src="/static/images/logo.png" alt="MEDGUARD AI Logo" class="brand-logo-img" style="height: 36px; width: 36px; object-fit: contain; border-radius: 6px; box-shadow: 0 2px 8px rgba(62,207,178,0.25);">
-        <div>MEDGUARD<span class="dot">.AI</span></div>
-        <span class="nav-version-tag">v2.4 ICU</span>
-      </div>
-
-      <div class="nav-menu">
-        <a href="#portal-home" class="nav-item-link active" id="nav-portal-home">
-          <span>📊</span> Overview
-        </a>
-
-        <!-- Dropdown 1: Clinical Suite -->
-        <div class="nav-dropdown">
-          <button class="nav-dropdown-trigger" id="nav-group-clinical">
-            <span>🩺</span> Clinical Suite <span class="chevron-arrow">▾</span>
-          </button>
-          <div class="nav-dropdown-menu">
-            <a href="#patient-assessment" class="nav-dropdown-item">
-              <div class="nav-dd-icon">🩺</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">Patient Assessment Studio</div>
-                <div class="nav-dd-sub">Real-time vitals, uncertainty & 48h risk</div>
-              </div>
-            </a>
-            <a href="#organ-dysfunction" class="nav-dropdown-item">
-              <div class="nav-dd-icon">🫀</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">Digital Twin Organ Map</div>
-                <div class="nav-dd-sub">6-system organ stress & SOFA scoring</div>
-              </div>
-            </a>
-            <a href="#bedside-copilot" class="nav-dropdown-item">
-              <div class="nav-dd-icon">🤖</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">Bedside AI Copilot</div>
-                <div class="nav-dd-sub">Sepsis orders & conversational rounds</div>
-              </div>
-            </a>
-            <a href="#counterfactual-simulator" class="nav-dropdown-item">
-              <div class="nav-dd-icon">💊</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">What-If Therapeutic Simulator</div>
-                <div class="nav-dd-sub">Pressor & fluid trajectory simulation</div>
-              </div>
-            </a>
-            <a href="#icu-calculators" class="nav-dropdown-item">
-              <div class="nav-dd-icon">🧮</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">ICU Infusion Calculators</div>
-                <div class="nav-dd-sub">Dosing rates, SSC bundle & ARDS P/F</div>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        <!-- Dropdown 2: AI & Research -->
-        <div class="nav-dropdown">
-          <button class="nav-dropdown-trigger" id="nav-group-research">
-            <span>🧠</span> AI & Research <span class="chevron-arrow">▾</span>
-          </button>
-          <div class="nav-dropdown-menu">
-            <a href="#simulation-section" class="nav-dropdown-item">
-              <div class="nav-dd-icon">🎬</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">24h Simulation Walkthrough</div>
-                <div class="nav-dd-sub">Hour-by-hour deterioration replay</div>
-              </div>
-            </a>
-            <a href="#explainability-studio" class="nav-dropdown-item">
-              <div class="nav-dd-icon">🔍</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">Explainability & SHAP Studio</div>
-                <div class="nav-dd-sub">Cross-modal attention & latent 2D PCA</div>
-              </div>
-            </a>
-            <a href="#research-benchmark" class="nav-dropdown-item">
-              <div class="nav-dd-icon">🔬</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">Research Benchmarks</div>
-                <div class="nav-dd-sub">Ablation study & multimodal metrics</div>
-              </div>
-            </a>
-          </div>
-        </div>
-
-        <!-- Dropdown 3: Analytics & Ward -->
-        <div class="nav-dropdown">
-          <button class="nav-dropdown-trigger" id="nav-group-ward">
-            <span>🏥</span> Analytics & Ward <span class="chevron-arrow">▾</span>
-          </button>
-          <div class="nav-dropdown-menu">
-            <a href="#cohort-eda" class="nav-dropdown-item">
-              <div class="nav-dd-icon">📈</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">MIMIC-IV Cohort EDA</div>
-                <div class="nav-dd-sub">18 stream missingness & trajectories</div>
-              </div>
-            </a>
-            <a href="#fairness-robustness" class="nav-dropdown-item">
-              <div class="nav-dd-icon">⚖️</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">Subgroup Fairness & Robustness</div>
-                <div class="nav-dd-sub">Demographic parity & sensor dropout</div>
-              </div>
-            </a>
-            <a href="#ward-telemetry" class="nav-dropdown-item">
-              <div class="nav-dd-icon">🏥</div>
-              <div class="nav-dd-content">
-                <div class="nav-dd-title">ICU Ward Telemetry Grid</div>
-                <div class="nav-dd-sub">Bedside monitors & Code Blue dispatch</div>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div class="nav-right-actions">
-        <div class="status-badge-demo" id="nav-dataset-badge">
-          <span class="pulse-dot" style="background: #10B981;"></span>
-          <span id="dataset-status-text">MIMIC-IV Connected</span>
-        </div>
-        <a href="#patient-assessment" class="btn btn-primary nav-quick-assess-btn">
-          ⚡ Launch Copilot
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="wrap">
-    
-    <!-- Safety Disclaimer Banner -->
-    <div class="disclaimer-banner">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
-      </svg>
+<!-- ================================================================
+     TOP NAVIGATION
+     ================================================================ -->
+<nav class="nav">
+  <div class="nav-inner">
+    <!-- Brand -->
+    <a href="/" class="nav-brand" style="text-decoration:none">
+      <div class="nav-logo">M+</div>
       <div>
-        <strong>RESEARCH PROTOTYPE ONLY:</strong> This clinical AI platform is developed strictly for research and educational evaluation. It is <strong>NOT</strong> a certified medical device and must never be used for clinical diagnosis, triage, or direct patient care.
+        <div class="nav-brand-name">MEDGUARD<span>.AI</span></div>
+        <div class="nav-brand-tag">Clinical Decision Support</div>
       </div>
-    </div>
-
-    <!-- =========================================================================
-         DR.AI STYLE HERO KV (KEY VISUAL) BANNER WITH AMBIENT HOSPITAL VIDEO
-         ========================================================================= -->
-    <section id="portal-home" class="web-section hero-section in-kv" style="position: relative; overflow: hidden; padding-top: 20px;">
-      <!-- Cinematic Ambient Looping Hospital Video Background -->
-      <video autoplay loop muted playsinline class="hero-bg-video" id="heroAmbientVideo">
-        <source src="/static/videos/hospital_icu_ambient.mp4" type="video/mp4">
-      </video>
-
-      <!-- Glowing Ambient Mesh Lights (Dr.AI style) -->
-      <div class="in-light green left"></div>
-      <div class="in-light blue right"></div>
-      <div class="in-light purple ctr"></div>
-
-      <div class="hero-content" style="position: relative; z-index: 2;">
-        <div class="hero-eyebrow float-element">
-          ✦ Dr.AI Edition — Multimodal ICU Clinical Intelligence Copilot
-        </div>
-        <h1 class="hero-title in_title" style="font-size: 48px; line-height: 1.18; max-width: 960px; margin: 0 auto 18px;">
-          <span class="colorful_text">Borderless Empowering</span><br>
-          Critical Care & ICU Deterioration AI
-        </h1>
-        <p class="hero-subtitle in_text" style="max-width: 860px; margin: 0 auto 28px; font-size: 16px; color: #CBD5E1; line-height: 1.7;">
-          MEDGUARD seamlessly integrates inpatient ICU continuous time-series hemodynamics with contemporaneous unstructured clinical notes. In <a href="#patient-assessment" style="color: #38BDF8; font-weight: 700; text-decoration: underline;">inpatient settings</a>, it incorporates <a href="#patient-assessment" style="color: #3ECFB2; font-weight: 700;">admission notes</a>, progress notes, and vasopressor pharmacotherapy alongside multi-organ digital twin simulations. For <a href="#bedside-copilot" style="color: #A78BFA; font-weight: 700;">decision support</a>, it features <a href="#bedside-copilot" style="color: #F472B6; font-weight: 700;">SBAR voice briefings</a>, BioBERT NER, and automated Sepsis-3 resuscitation pathways.
-        </p>
-        
-        <div class="draibtncont">
-          <a href="#patient-assessment" class="draibtn btn-blue">
-            ⚡ Free Start & Patient Assessment
-          </a>
-          <a href="#hospital-video-showcase" class="draibtn btn-w line">
-            📹 Hospital ICU Video Tour
-          </a>
-          <a href="#simulation-section" class="draibtn btn-w line">
-            🎬 24h Deterioration Demo
-          </a>
-          <a href="#research-benchmark" class="draibtn btn-green">
-            🔬 View Empirical Ablation Study
-          </a>
-        </div>
-
-        <!-- LIVE ECG WAVEFORM MONITOR DECK -->
-        <div class="conic-glow-card" style="max-width: 900px; margin: 36px auto 20px;">
-          <div class="conic-glow-inner" style="padding: 16px 20px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
-              <div style="display: flex; align-items: center; gap: 10px;">
-                <span class="pulse-dot" style="background: #3ECFB2;"></span>
-                <span style="font-size: 13px; font-weight: 700; color: #3ECFB2; letter-spacing: 0.08em; text-transform: uppercase; font-family: var(--font-mono);">
-                  Lead II Telemetry Stream (Live 60 FPS • Real MIMIC-IV Cohort)
-                </span>
-              </div>
-              <div style="display: flex; gap: 16px; font-family: 'Space Mono'; font-size: 13px;">
-                <span style="color: #3ECFB2;">HR: <strong id="live-ecg-hr">88</strong> bpm</span>
-                <span style="color: #7CEFD8;">MAP: <strong id="live-ecg-map">85</strong> mmHg</span>
-                <span style="color: #A78BFA;">SpO2: <strong id="live-ecg-spo2">98%</strong></span>
-              </div>
-            </div>
-            
-            <div class="ecg-monitor-deck">
-              <div class="ecg-grid-overlay"></div>
-              <canvas id="ecgCanvas" class="ecg-canvas"></canvas>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         DR.AI STAT COUNTERS SECTION (pf-nbr)
-         ========================================================================= -->
-    <section class="pf-nbr" id="pf-nbr">
-      <div class="nbr-grid">
-        <div class="nbrbox">
-          <div class="nbrbox-nbr colorful_text">0.952</div>
-          <div class="nbrbox-name colorful_text">MULTIMODAL AUROC</div>
-          <div class="nbrbox-subname">Held-out MIMIC-IV cohort discrimination (+0.012 vs structured alone)</div>
-        </div>
-        <div class="nbrbox">
-          <div class="nbrbox-nbr colorful_text">38</div>
-          <div class="nbrbox-name colorful_text">CLINICAL CONCEPTS</div>
-          <div class="nbrbox-subname">BioBERT Named Entity Recognition & ClinicalBERT Narrative Attributions</div>
-        </div>
-        <div class="nbrbox">
-          <div class="nbrbox-nbr colorful_text">18</div>
-          <div class="nbrbox-name colorful_text">TELEMETRY STREAMS</div>
-          <div class="nbrbox-subname">Continuous hourly vital waves & laboratory biomarkers monitored</div>
-        </div>
-        <div class="nbrbox">
-          <div class="nbrbox-nbr colorful_text">95<span style="font-size: 24px; color: var(--muted);">/100</span></div>
-          <div class="nbrbox-name colorful_text">CALIBRATION SCORE</div>
-          <div class="nbrbox-subname">Temperature scaled Brier score: 0.076 with Expected Calibration Error: 0.061</div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         DR.AI BENTO SHOWCASES (in-ex)
-         ========================================================================= -->
-    <section class="in-ex-section">
-      <div class="in-ex-grid">
-        
-        <!-- Bento 1: For Inpatient ICU Professionals -->
-        <div class="ieb left">
-          <div class="ieb-tag">Inpatient Critical Care</div>
-          <h3 class="ieb-title">Dr.AI for <span class="colorful_text">ICU Professionals</span></h3>
-          <p class="ieb-detail">
-            Empower bedside physicians and intensivists with automated clinical pathways and real-time deterioration forecasting:
-          </p>
-          <ul class="ieb-list">
-            <li><strong>Continuous Hemodynamic Telemetry:</strong> 24h MAP, Heart Rate, Lactate, SpO2 wave tracking.</li>
-            <li><strong>Digital Twin Multi-Organ Mapping:</strong> 6-system stress monitoring (Cardiovascular, Renal, Hepatic).</li>
-            <li><strong>Vasopressor Pharmacotherapy:</strong> Norepinephrine titration & max safe dose guardrails.</li>
-            <li><strong>Autonomous SBAR Audio Briefings:</strong> Voice synthesizable bedside handoff reports.</li>
-          </ul>
-          <div class="draibtncont" style="justify-content: flex-start; margin-top: 16px;">
-            <a href="#patient-assessment" class="draibtn btn-blue">Launch Patient Studio</a>
-            <a href="#organ-dysfunction" class="draibtn btn-w line">Explore Digital Twin</a>
-          </div>
-        </div>
-
-        <!-- Bento 2: For Bedside Clinical Decision Support -->
-        <div class="ieb right">
-          <div class="ieb-tag">Clinical Decision Support</div>
-          <h3 class="ieb-title">Dr.AI for <span class="colorful_text">Autonomous Rounding</span></h3>
-          <p class="ieb-detail">
-            Interactive AI rounding assistant powered by multimodal context, guideline citations, and speech recognition:
-          </p>
-          <ul class="ieb-list">
-            <li><strong>Sepsis-3 Resuscitation Order Set:</strong> Evidence-based fluids, lactate clearance & pressors.</li>
-            <li><strong>What-If Therapeutic Simulator:</strong> Simulate post-intervention risk reduction in real time.</li>
-            <li><strong>PaO2 / FiO2 ARDS Classifier:</strong> Berlin definition severity & lung-protective ventilation.</li>
-            <li><strong>BioBERT Speech Dictation:</strong> Dictate clinical notes with real-time entity recognition.</li>
-          </ul>
-          <div class="draibtncont" style="justify-content: flex-start; margin-top: 16px;">
-            <a href="#bedside-copilot" class="draibtn btn-pur">Open AI Copilot</a>
-            <a href="#counterfactual-simulator" class="draibtn btn-w line">Try What-If Simulator</a>
-          </div>
-        </div>
-
-        <!-- Bento 3: Wide Bottom Box - Medical Exam Center & Ward Command -->
-        <div class="ieb wide">
-          <div class="ieb-tag">Hospital Command Center</div>
-          <h3 class="ieb-title">Dr.AI for <span class="colorful_text">ICU Ward Telemetry & Code Blue Command</span></h3>
-          <p class="ieb-detail" style="max-width: 900px;">
-            Centralized telemetry monitoring for multiple active ICU beds with automated risk triage, Population Stability Index (PSI) drift monitoring, and emergency Rapid Response / Code Blue dispatch team paging.
-          </p>
-          <div class="draibtncont" style="justify-content: flex-start; margin-top: 20px;">
-            <a href="#ward-telemetry" class="draibtn btn-green">View 8-Bed Telemetry Grid</a>
-            <a href="#research-benchmark" class="draibtn btn-w line">Ablation & Fairness Lab</a>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         DR.AI STYLE HOSPITAL ICU VIDEO THEATER & LIVE CLINICAL DEPLOYMENT (in-why)
-         ========================================================================= -->
-    <section id="hospital-video-showcase" class="web-section">
-      <div class="panel-card" style="background: linear-gradient(135deg, rgba(15, 43, 70, 0.85) 0%, rgba(6, 18, 32, 0.95) 100%);">
-        <div class="panel-header" style="flex-wrap: wrap; gap: 14px;">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 6px;">📹 Hospital Clinical Intelligence Showcase</div>
-            <h3 class="panel-title">A New Dawn in Medical Care — Empowering Intensive Care Units</h3>
-            <div class="panel-subtitle">Live hospital ICU monitoring environment powered by MEDGUARD Multimodal Clinical AI</div>
-          </div>
-          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <label class="btn btn-secondary" style="padding: 8px 14px; font-size: 12px; cursor: pointer;">
-              📂 Load Custom Hospital Video
-              <input type="file" accept="video/*" style="display: none;" onchange="loadCustomHospitalVideo(event)">
-            </label>
-            <button id="hospitalVideoPlayBtn" class="btn btn-primary" style="padding: 8px 18px; font-size: 13px;" onclick="toggleHospitalVideo()">
-              ▶ Play Video
-            </button>
-          </div>
-        </div>
-
-        <div class="hospital-video-theater">
-          <!-- Top HUD Overlay -->
-          <div class="hospital-video-overlay-hud">
-            <div class="hospital-video-hud-tag">
-              <span class="pulse-dot" style="background: #10B981;"></span>
-              <span>ICU WARD A • TELEMETRY FEED ACTIVE</span>
-            </div>
-            <div class="hospital-video-hud-tag" style="border-color: #38BDF8; color: #38BDF8;">
-              <span>HD 1080p • 25 FPS HOSPITAL STREAM</span>
-            </div>
-          </div>
-
-          <!-- Video Player -->
-          <video id="hospitalMainVideo" class="hospital-video-player" loop playsinline preload="auto">
-            <source src="/static/videos/hospital_icu_ambient.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
-
-          <!-- Bottom Controls Bar -->
-          <div class="hospital-video-controls-bar">
-            <div style="display: flex; align-items: center; gap: 12px;">
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleHospitalVideo()">
-                <span id="hospitalVideoBtnLabel">▶ Play</span>
-              </button>
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleHospitalAudio()">
-                <span id="hospitalAudioBtnLabel">🔇 Unmute</span>
-              </button>
-              <span id="hospitalVideoTime" style="font-family: var(--font-mono); font-size: 12px; color: var(--muted);">00:00 / 00:00</span>
-            </div>
-            <div style="display: flex; gap: 10px; align-items: center;">
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="setHospitalVideoSpeed(1)">1x</button>
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="setHospitalVideoSpeed(1.5)">1.5x</button>
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="setHospitalVideoSpeed(2)">2x</button>
-              <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 12px;" onclick="toggleHospitalFullscreen()">⛶ Fullscreen</button>
-            </div>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 14px;">
-          <div style="background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 8px; border-left: 3px solid #38BDF8;">
-            <div style="font-size: 11px; font-weight: 800; color: #38BDF8; text-transform: uppercase;">Continuous ICU Vigilance</div>
-            <div style="font-size: 12px; color: #CBD5E1; margin-top: 2px;">Automated 24h surveillance across bedside hemodynamic monitors.</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 8px; border-left: 3px solid #3ECFB2;">
-            <div style="font-size: 11px; font-weight: 800; color: #3ECFB2; text-transform: uppercase;">Early Warning Trigger</div>
-            <div style="font-size: 12px; color: #CBD5E1; margin-top: 2px;">Forecasts acute deterioration 48 hours prior to clinical decompensation.</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.3); padding: 12px 16px; border-radius: 8px; border-left: 3px solid #A78BFA;">
-            <div style="font-size: 11px; font-weight: 800; color: #A78BFA; text-transform: uppercase;">Multimodal Synthesis</div>
-            <div style="font-size: 12px; color: #CBD5E1; margin-top: 2px;">Fuses continuous wave vitals with contemporaneous physician notes.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Floating Dr.AI Quick Copilot Trigger Button -->
-    <a class="fixedbtn" href="#bedside-copilot">
-      <span>🤖</span> Dr.AI Copilot
     </a>
 
-    <!-- =========================================================================
-         INTERACTIVE SIMULATION WALKTHROUGH & NEURAL FLOW
-         ========================================================================= -->
-    <section id="simulation-section" class="web-section">
-      
-      <!-- Interactive Video Simulation Player -->
-      <div class="panel-card" style="background: linear-gradient(135deg, #0d2038 0%, #0A1628 100%);">
-        <div class="panel-header" style="flex-wrap: wrap; gap: 14px;">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 6px;">🎬 Interactive Clinical Deterioration Walkthrough</div>
-            <h3 class="panel-title">24-Hour Patient Progression & Multimodal Alert Trigger Video Simulator</h3>
-          </div>
-          <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-            <button id="simAudioBtn" class="btn btn-secondary" style="padding: 8px 14px; font-size: 12px;" onclick="toggleSimAudio()">
-              🔊 Telemetry Audio: <span id="simAudioLabel">Off</span>
-            </button>
-            <div class="sim-speed-selector">
-              <button class="speed-btn active" data-speed="1" onclick="setSimSpeed(1)">1x</button>
-              <button class="speed-btn" data-speed="2" onclick="setSimSpeed(2)">2x</button>
-              <button class="speed-btn" data-speed="4" onclick="setSimSpeed(4)">4x</button>
-            </div>
-            <button id="simPlayBtn" class="btn btn-primary" style="padding: 8px 20px; font-size: 13px;">
-              ▶ Play Simulation
-            </button>
-          </div>
-        </div>
-
-        <!-- Chapter Jump Tabs -->
-        <div class="sim-chapter-tabs">
-          <button class="chapter-tab active" onclick="jumpToSimStage(0)">Hour 0: Baseline Admission</button>
-          <button class="chapter-tab" onclick="jumpToSimStage(1)">Hour 8: Tachycardia</button>
-          <button class="chapter-tab" onclick="jumpToSimStage(2)">Hour 14: Sepsis & Pressor</button>
-          <button class="chapter-tab" onclick="jumpToSimStage(3)">Hour 20: Shock Escalation</button>
-          <button class="chapter-tab" onclick="jumpToSimStage(4)">Hour 24: AI 48h Warning Triggered</button>
-        </div>
-
-        <div class="sim-player-wrapper">
-          <!-- Simulation Top HUD -->
-          <div class="sim-hud-header">
-            <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-              <span id="simHudBadge" class="risk-level-badge badge-low" style="margin: 0;">Normal Baseline</span>
-              <strong id="simHudHour" style="color: #38BDF8; font-family: 'JetBrains Mono'; font-size: 16px;">Hour 0 / 24</strong>
-              <span id="simHudVasoTag" style="font-size: 12px; background: rgba(239,68,68,0.15); color: #F87171; padding: 2px 8px; border-radius: 4px; display: none;">Norepi: 0.18 mcg/kg/min</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 18px;">
-              <div>
-                <span style="font-size: 12px; color: var(--text-muted);">Simulated MAP:</span>
-                <strong id="simHudMap" style="color: #38BDF8; font-family: 'JetBrains Mono'; margin-left: 4px;">88 mmHg</strong>
-              </div>
-              <div>
-                <span style="font-size: 12px; color: var(--text-muted);">Simulated Lactate:</span>
-                <strong id="simHudLact" style="color: #EF4444; font-family: 'JetBrains Mono'; margin-left: 4px;">1.2 mmol/L</strong>
-              </div>
-              <div>
-                <span style="font-size: 12px; color: var(--text-muted);">AI Forecast Risk:</span>
-                <strong id="simHudRisk" style="font-size: 22px; font-family: 'JetBrains Mono'; color: #F87171; margin-left: 6px;">12.0%</strong>
-              </div>
-            </div>
-          </div>
-
-          <!-- Video Monitor Animated Viewport -->
-          <div class="sim-monitor-viewport">
-            <canvas id="simMonitorCanvas" class="sim-monitor-canvas"></canvas>
-            <div id="simAlertOverlay" class="sim-alert-overlay" style="display: none;">
-              <div class="alert-pulse-box">
-                <span style="font-size: 24px;">🚨</span>
-                <div>
-                  <h4 style="color: #F87171; font-size: 16px; margin-bottom: 2px;">MULTIMODAL EARLY WARNING TRIGGERED (Hour 24)</h4>
-                  <p style="font-size: 13px; color: #E2E8F0;">Predicted 48-Hour Deterioration Probability: <strong>84.2%</strong> (High Sepsis Mortality Risk)</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Scenario Narrative Description -->
-          <div style="padding: 20px 24px; min-height: 90px; background: rgba(7, 14, 26, 0.85); border-top: 1px solid var(--border-subtle);">
-            <h4 id="simHudTitle" style="color: #fff; font-size: 17px; margin-bottom: 6px;">ICU Admission</h4>
-            <p id="simHudDesc" style="color: #CBD5E1; font-size: 14px; line-height: 1.6;">
-              Patient admitted post-op. Vital signs baseline stable. MAP 88 mmHg, Lactate 1.2 mmol/L.
-            </p>
-          </div>
-
-          <!-- Timeline Scrub Bar & Controls -->
-          <div class="sim-controls-bar">
-            <button class="btn btn-secondary" style="padding: 5px 12px; font-size: 12px;" onclick="stepSim(-1)">⏮ -1h</button>
-            <div id="simTimelineBar" class="sim-timeline-bar" title="Click to scrub timeline">
-              <div id="simTimelineProgress" class="sim-timeline-progress"></div>
-              <div class="sim-marker" style="left: 0%;"></div>
-              <div class="sim-marker" style="left: 33.3%;"></div>
-              <div class="sim-marker" style="left: 58.3%;"></div>
-              <div class="sim-marker" style="left: 83.3%;"></div>
-              <div class="sim-marker" style="left: 100%;"></div>
-            </div>
-            <button class="btn btn-secondary" style="padding: 5px 12px; font-size: 12px;" onclick="stepSim(1)">+1h ⏭</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Neural Particle Canvas -->
-      <div class="panel-card">
-        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h3 class="panel-title">🧠 Multimodal Neural Embeddings Flow</h3>
-            <div class="panel-subtitle">Interactive data stream flowing physiological representations ($e_s$) and clinical notes embeddings ($e_t$) into Gated Fusion Core</div>
-          </div>
-          <div style="display: flex; gap: 16px; font-size: 12px; font-family: var(--font-mono);">
-            <span style="color: var(--teal);">● Physiological Wave ($e_s$)</span>
-            <span style="color: #A78BFA;">● Clinical Notes NLP ($e_t$)</span>
-            <span style="color: #7CEFD8;">● Gated Multimodal Core ($e_f$)</span>
-          </div>
-        </div>
-
-        <div class="neural-canvas-container">
-          <canvas id="neuralCanvas" class="neural-canvas"></canvas>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- =========================================================================
-         SECTION 2: LIVE PATIENT RISK ASSESSMENT STUDIO
-         ========================================================================= -->
-    <section id="patient-assessment" class="web-section">
-      
-      <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
-        <div>
-          <div class="hero-eyebrow" style="margin-bottom: 8px;">Live Clinical Studio</div>
-          <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🩺 Patient Risk Assessment & Real-Time Copilot</h2>
-          <p class="panel-subtitle">
-            Select a clinical preset or drag physiological sliders to observe instantaneous multimodal risk recalculation.
-          </p>
-        </div>
-      </div>
-
-      <!-- Case & Real Patient Selector Controls -->
-      <div style="display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap;">
-        <span style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono);">MIMIC-IV Cohort:</span>
-        <select id="mimic-patient-select" class="clinical-select" style="background: #0F2B46; color: #3ECFB2; border: 1px solid var(--border-teal); padding: 8px 14px; border-radius: var(--r-sm); font-size: 13px; font-family: var(--font-sans); font-weight: 600; cursor: pointer;" onchange="onRealPatientSelect(this.value)">
-          <option value="">Loading Real MIMIC-IV Patients...</option>
-        </select>
-
-        <span style="font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono); margin-left: 8px;">Clinical Presets:</span>
-        <button class="btn-preset active" id="preset-sepsis" onclick="loadPatientCase('sepsis_shock')">
-          🔴 Sepsis Shock (#10042)
-        </button>
-        <button class="btn-preset" id="preset-ards" onclick="loadPatientCase('ards_respiratory')">
-          🟠 ARDS (#10088)
-        </button>
-        <button class="btn-preset" id="preset-postop" onclick="loadPatientCase('postop_stable')">
-          🟢 Post-Op CABG (#10018)
-        </button>
-      </div>
-
-      <!-- Main Risk Gauge Grid -->
-      <div class="risk-display-grid">
-        
-        <!-- Risk Output Box -->
-        <div class="risk-score-box">
-          <div id="risk-badge-box" class="risk-level-badge badge-high">HIGH RISK (≥ 50%)</div>
-          <div class="risk-score-sub" style="font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">48-Hour Deterioration Risk</div>
-          <div id="risk-val-display" class="risk-score-val">84.2%</div>
-          <div id="raw-risk-sub" class="risk-score-sub" style="font-family: var(--font-mono);">Calibrated: 84.2% | Raw: 85.1%</div>
-          
-          <div style="width: 100%; margin-top: 20px; text-align: left;">
-            <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 6px;">
-              <span style="color: var(--muted); font-family: var(--font-mono);">MC-Dropout Uncertainty:</span>
-              <strong id="uncertainty-val-display" style="color: var(--teal); font-family: var(--font-mono);">σ = 0.038</strong>
-            </div>
-            <div style="height: 6px; background: rgba(255,255,255,0.08); border-radius: 999px; overflow: hidden;">
-              <div id="uncertainty-bar-fill" style="width: 25%; height: 100%; background: var(--teal);"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Multi-Horizon Trajectory -->
-        <div class="panel-card" style="margin: 0; padding: 24px;">
-          <div style="font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center;">
-            <span>Multi-Horizon Risk Trajectory</span>
-            <span style="font-size: 11px; color: var(--muted); font-family: var(--font-mono);">6h ➔ 12h ➔ 24h ➔ 48h</span>
-          </div>
-          <div style="height: 190px;">
-            <canvas id="riskTrajectoryCanvas"></canvas>
-          </div>
-        </div>
-
-        <!-- Modality Gating & Scores -->
-        <div class="panel-card" style="margin: 0; padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
-          <div>
-            <div style="font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 4px;">Modality Attention Gating</div>
-            <div style="font-size: 12px; color: var(--muted);">Learned Sigmoid Modality Weights ($g$)</div>
-
-            <div class="modality-meter">
-              <div style="display: flex; justify-content: space-between; font-size: 12px; font-family: var(--font-mono);">
-                <span style="color: var(--teal);">Physiology: <strong id="struct-w-label">58.4%</strong></span>
-                <span style="color: #A78BFA;">Text: <strong id="text-w-label">41.6%</strong></span>
-              </div>
-              <div class="meter-track">
-                <div id="meter-fill-struct" class="meter-fill-struct" style="width: 58.4%;"></div>
-                <div id="meter-fill-text" class="meter-fill-text" style="width: 41.6%;"></div>
-              </div>
-            </div>
-          </div>
-
-          <div style="background: rgba(15, 43, 70, 0.75); padding: 14px; border-radius: var(--r-sm); border: 1px solid var(--border); margin-top: 14px;">
-            <div style="font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono);">ICU Organ Dysfunction Baselines:</div>
-            <div style="display: flex; justify-content: space-around; margin-top: 8px;">
-              <div>SOFA Proxy: <strong id="sofa-proxy-val" style="color: #fff; font-size: 16px; font-family: var(--font-mono);">14</strong></div>
-              <div>SAPS II Proxy: <strong id="saps-proxy-val" style="color: #fff; font-size: 16px; font-family: var(--font-mono);">56</strong></div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Live Interactive Vitals Sliders -->
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <h3 class="panel-title">🎛️ Real-Time Physiological Parameter Sliders</h3>
-            <div class="panel-subtitle">Drag sliders to immediately simulate physiological shifts at Hour 24</div>
-          </div>
-        </div>
-
-        <div class="vitals-slider-group">
-          <div class="slider-item">
-            <div class="slider-header">
-              <span>Mean Arterial Pressure (MAP)</span>
-              <strong id="slider-map-val">60 mmHg</strong>
-            </div>
-            <input type="range" min="30" max="140" value="60" class="vital-range-slider" id="slider-map" oninput="onVitalSliderChange('map', this.value)">
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-header">
-              <span>Lactate Level</span>
-              <strong id="slider-lactate-val">4.5 mmol/L</strong>
-            </div>
-            <input type="range" min="0.5" max="15.0" step="0.1" value="4.5" class="vital-range-slider" id="slider-lactate" oninput="onVitalSliderChange('lactate', this.value)">
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-header">
-              <span>Heart Rate</span>
-              <strong id="slider-hr-val">118 bpm</strong>
-            </div>
-            <input type="range" min="40" max="180" value="118" class="vital-range-slider" id="slider-hr" oninput="onVitalSliderChange('heart_rate', this.value)">
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-header">
-              <span>SpO2 Oxygen</span>
-              <strong id="slider-spo2-val">89%</strong>
-            </div>
-            <input type="range" min="70" max="100" value="89" class="vital-range-slider" id="slider-spo2" oninput="onVitalSliderChange('spo2', this.value)">
-          </div>
-        </div>
-      </div>
-
-      <!-- 24h Vitals Graph -->
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <h3 class="panel-title">📈 24-Hour Physiological Evolution (Vitals & Labs)</h3>
-            <div class="panel-subtitle">Standardized trajectory across observation hours $[0..23]$</div>
-          </div>
-          <div style="font-size: 13px; color: var(--muted); font-family: var(--font-mono);">
-            Patient: <strong id="pt-id-display" style="color: #fff;">#10042</strong> (<span id="pt-demog-display">68 yrs / M • MICU</span>)
-          </div>
-        </div>
-        <div style="height: 250px;">
-          <canvas id="vitalsTrajectoryCanvas"></canvas>
-        </div>
-        <div style="display: flex; gap: 12px; margin-top: 14px; flex-wrap: wrap;">
-          <button class="btn btn-secondary" style="border-color: #38BDF8; color: #38BDF8;" onclick="playSbarBriefing()">
-            <span id="sbar-btn-icon">🎙️</span> Read Multimodal SBAR Audio Briefing
-          </button>
-          <button class="btn btn-secondary" onclick="exportClinicalDossier()">
-            📄 Export Clinical Research Dossier
-          </button>
-          <button class="btn btn-primary" onclick="analyzePatientRecord()">
-            ⚡ Re-Analyze Patient Record
-          </button>
-        </div>
-      </div>
-
-      <!-- SBAR Audio Briefing Card -->
-      <div id="sbar-briefing-card" class="panel-card" style="display: none; background: rgba(15, 43, 70, 0.9); border: 1px solid #38BDF8;">
-        <div class="panel-header">
-          <div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span class="pulse-dot" style="background: #38BDF8;"></span>
-              <h4 style="color: #38BDF8; font-size: 16px; font-weight: 700;">🎙️ Autonomous SBAR Clinical Audio Briefing</h4>
-            </div>
-            <div class="panel-subtitle">Physician-grade situation handoff synthesized with voice audio copilot</div>
-          </div>
-          <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 12px;" onclick="stopSbarAudio()">⏹ Stop Audio</button>
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 10px;">
-          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; border-left: 3px solid #38BDF8;">
-            <div style="font-size: 11px; font-weight: 800; color: #38BDF8; text-transform: uppercase;">Situation</div>
-            <div id="sbar-situation-text" style="font-size: 13px; color: #E2E8F0; margin-top: 4px; line-height: 1.5;">-</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; border-left: 3px solid #A78BFA;">
-            <div style="font-size: 11px; font-weight: 800; color: #A78BFA; text-transform: uppercase;">Background</div>
-            <div id="sbar-background-text" style="font-size: 13px; color: #E2E8F0; margin-top: 4px; line-height: 1.5;">-</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; border-left: 3px solid #F59E0B;">
-            <div style="font-size: 11px; font-weight: 800; color: #F59E0B; text-transform: uppercase;">Assessment</div>
-            <div id="sbar-assessment-text" style="font-size: 13px; color: #E2E8F0; margin-top: 4px; line-height: 1.5;">-</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; border-left: 3px solid #10B981;">
-            <div style="font-size: 11px; font-weight: 800; color: #10B981; text-transform: uppercase;">Recommendation</div>
-            <div id="sbar-recommendation-text" style="font-size: 13px; color: #E2E8F0; margin-top: 4px; line-height: 1.5;">-</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Notes Entry with Voice Dictation & BioBERT NER Extractor -->
-      <div class="panel-card">
-        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h3 class="panel-title">📝 Contemporaneous Clinical Documentation</h3>
-            <div class="panel-subtitle">Notes documented strictly within 24-hour observation window (No discharge summaries)</div>
-          </div>
-          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button id="voice-dictate-btn" class="btn btn-secondary" style="border-color: #EF4444; color: #F87171;" onclick="toggleVoiceDictation()">
-              <span id="voice-mic-icon">🎤</span> Dictate Note (Live Speech)
-            </button>
-            <button class="btn btn-secondary" style="border-color: #A78BFA; color: #A78BFA;" onclick="extractBioBertEntities()">
-              <span>🔍</span> Extract BioBERT Entities
-            </button>
-            <button class="btn btn-primary" style="padding: 7px 16px; font-size: 13px;" onclick="rescoreWithCurrentNotes()">
-              <span>⚡</span> Re-Score Multimodal Risk
-            </button>
-          </div>
-        </div>
-        <textarea id="pt-notes-input" class="clinical-note-textarea" placeholder="Enter clinical notes or use voice dictation..."></textarea>
-        
-        <!-- Live BioBERT Entities Display Cloud -->
-        <div id="biobert-entities-cloud" style="display: none; margin-top: 14px; padding: 14px; background: rgba(7, 14, 26, 0.85); border: 1px solid var(--border-teal); border-radius: var(--r-sm);">
-          <div style="font-size: 12px; font-weight: 700; color: var(--teal); margin-bottom: 8px; text-transform: uppercase; font-family: var(--font-mono);">
-            BioBERT Named Entities Recognized:
-          </div>
-          <div id="ner-chips-container" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- =========================================================================
-         NOVELTY SECTION: DIGITAL TWIN MULTI-ORGAN DYSFUNCTION VISUALIZER
-         ========================================================================= -->
-    <section id="organ-dysfunction" class="web-section">
-      <div class="panel-card">
-        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 8px;">Physiological Digital Twin</div>
-            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🫀 Digital Twin Organ Dysfunction Visualizer</h2>
-            <div class="panel-subtitle">
-              Continuous multi-system physiological mapping across 6 critical organ domains with clinical guideline targets
-            </div>
-          </div>
-          <div style="display: flex; align-items: center; gap: 14px;">
-            <div style="text-align: right;">
-              <div style="font-size: 11px; color: var(--muted); font-family: var(--font-mono); text-transform: uppercase;">Overall Organ Stress:</div>
-              <strong id="digital-twin-overall-stress" style="font-size: 24px; color: #EF4444; font-family: var(--font-mono);">68.5%</strong>
-            </div>
-            <button class="btn btn-secondary" onclick="refreshDigitalTwinData()">
-              🔄 Refresh Digital Twin
-            </button>
-          </div>
-        </div>
-
-        <!-- 6-Organ Systems Grid -->
-        <div id="organ-twin-container" class="organ-twin-grid">
-          <!-- Populated by JS -->
-        </div>
-
-        <!-- Clinical Pearls Banner -->
-        <div style="margin-top: 20px; padding: 16px 20px; background: rgba(15, 43, 70, 0.6); border-left: 4px solid var(--teal); border-radius: var(--r-sm);">
-          <div style="font-size: 12px; font-weight: 800; color: var(--teal); text-transform: uppercase; margin-bottom: 4px;">Organ Cascade Pearl:</div>
-          <div id="organ-twin-pearls-text" style="font-size: 13px; color: #E2E8F0; line-height: 1.6;">
-            Cardiovascular stress is elevated due to low Mean Arterial Pressure. Early vasopressor support prevents renal medullary hypoxia and ischemic tubular injury.
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         NOVELTY SECTION: AUTONOMOUS BEDSIDE AI COPILOT & CLINICAL ROUNDING AGENT
-         ========================================================================= -->
-    <section id="bedside-copilot" class="web-section">
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 8px;">Autonomous Bedside Agent</div>
-            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🤖 Bedside AI Clinical Copilot & Rounding Assistant</h2>
-            <div class="panel-subtitle">
-              Physician-grade interactive dialogue agent powered by multimodal context, guideline citations, and automated order drafting
-            </div>
-          </div>
-        </div>
-
-        <div class="copilot-chat-container">
-          <!-- Chat Messages Scrollable Area -->
-          <div id="copilot-messages-area" class="copilot-messages">
-            <div class="copilot-bubble bot">
-              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <span class="pulse-dot" style="background: var(--teal);"></span>
-                <strong style="color: var(--teal); font-size: 13px;">MEDGUARD Clinical Copilot</strong>
-                <span style="font-size: 11px; color: var(--muted); font-family: var(--font-mono);">Evidence-Based Decision Support</span>
-              </div>
-              <p style="margin: 0; color: #E2E8F0;">
-                Hello Doctor. I am actively monitoring <strong>Patient #10042</strong>. Their calibrated 48-hour deterioration probability is <strong>84.2% (Critical High Risk)</strong> with SOFA score of 14. How can I assist during bedside rounds?
-              </p>
-            </div>
-          </div>
-
-          <!-- Quick Action Prompts Bar -->
-          <div class="copilot-chips-bar">
-            <button class="prompt-chip" onclick="sendCopilotPreset('Draft Sepsis-3 1-Hour Resuscitation Order Set')">
-              📋 Sepsis-3 Order Set
-            </button>
-            <button class="prompt-chip" onclick="sendCopilotPreset('Evaluate Vasopressor & Inotrope Escalation Strategy')">
-              ⚡ Vasopressor Titration
-            </button>
-            <button class="prompt-chip" onclick="sendCopilotPreset('Generate KDIGO Renal Failure Action Plan')">
-              🫘 KDIGO Renal Plan
-            </button>
-            <button class="prompt-chip" onclick="sendCopilotPreset('Explain Cross-Modal Discrepancy between text notes and telemetry')">
-              🧠 Cross-Modal NLP Analysis
-            </button>
-            <button class="prompt-chip" onclick="sendCopilotPreset('Generate 24h Attending Rounds Summary')">
-              📝 Attending Handoff
-            </button>
-          </div>
-
-          <!-- Input Bar -->
-          <div class="copilot-input-bar">
-            <input type="text" id="copilot-user-input" class="copilot-input" placeholder="Ask about patient vitals, medications, clinical guidelines..." onkeydown="if(event.key==='Enter') sendCopilotMessage()">
-            <button class="btn btn-secondary" style="border-color: #38BDF8; color: #38BDF8; padding: 0 16px;" onclick="dictateCopilotQuestion()">
-              🎤 Ask
-            </button>
-            <button class="btn btn-primary" style="padding: 0 22px;" onclick="sendCopilotMessage()">
-              Send ➔
-            </button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         SECTION 3: WHAT-IF COUNTERFACTUAL INTERVENTION SIMULATOR
-         ========================================================================= -->
-    <section id="counterfactual-simulator" class="web-section">
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 8px;">Therapeutic Simulator</div>
-            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">💊 What-If Counterfactual Intervention Studio</h2>
-            <div class="panel-subtitle">
-              Simulate clinical therapeutics (vasopressor titration, fluid clearance, oxygenation) and project counterfactual risk reduction in real time
-            </div>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1fr 1.3fr; gap: 24px;">
-          <!-- Therapeutic Levers Sliders -->
-          <div>
-            <h4 style="color: #fff; font-size: 16px; font-weight: 700; margin-bottom: 14px;">Therapeutic Levers & Interventions:</h4>
-            
-            <div class="slider-grid" style="grid-template-columns: 1fr; gap: 14px;">
-              <div class="slider-item">
-                <div class="slider-header">
-                  <span>💉 Titrate Norepinephrine (Δ MAP)</span>
-                  <strong id="cf-map-val" style="color: #38BDF8;">+15 mmHg</strong>
-                </div>
-                <input type="range" min="0" max="30" value="15" class="vital-range-slider" id="cf-slider-map" oninput="onCounterfactualSliderChange()">
-              </div>
-
-              <div class="slider-item">
-                <div class="slider-header">
-                  <span>💧 Fluid Resuscitation & Clearance (Δ Lactate)</span>
-                  <strong id="cf-lactate-val" style="color: #3ECFB2;">-1.5 mmol/L</strong>
-                </div>
-                <input type="range" min="-3.0" max="0.0" step="0.1" value="-1.5" class="vital-range-slider" id="cf-slider-lactate" oninput="onCounterfactualSliderChange()">
-              </div>
-
-              <div class="slider-item">
-                <div class="slider-header">
-                  <span>🫁 High-Flow Oxygen / PEEP (Δ SpO2)</span>
-                  <strong id="cf-spo2-val" style="color: #A78BFA;">+4%</strong>
-                </div>
-                <input type="range" min="0" max="10" value="4" class="vital-range-slider" id="cf-slider-spo2" oninput="onCounterfactualSliderChange()">
-              </div>
-
-              <div class="slider-item">
-                <div class="slider-header">
-                  <span>❤️ Rate Control / Sedation (Δ Heart Rate)</span>
-                  <strong id="cf-hr-val" style="color: #F59E0B;">-15 bpm</strong>
-                </div>
-                <input type="range" min="-30" max="0" value="-15" class="vital-range-slider" id="cf-slider-hr" oninput="onCounterfactualSliderChange()">
-              </div>
-            </div>
-
-            <!-- Estimated Risk Reduction Badge -->
-            <div style="background: rgba(16, 185, 129, 0.12); border: 1px solid #10B981; padding: 16px; border-radius: var(--r-sm); margin-top: 16px;">
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                  <div style="font-size: 11px; font-weight: 800; color: #10B981; text-transform: uppercase;">Projected Mortality Risk Reduction:</div>
-                  <div id="cf-risk-delta-text" style="font-size: 22px; font-weight: 800; color: #fff; font-family: var(--font-mono); margin-top: 2px;">
-                    -14.8% Absolute (35.2% Rel.)
-                  </div>
-                </div>
-                <div id="cf-status-badge" class="risk-level-badge badge-low" style="margin: 0; padding: 6px 12px;">
-                  Deterioration Arrested
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Counterfactual Trajectory Comparison Chart -->
-          <div class="panel-card" style="margin: 0; background: rgba(15, 23, 42, 0.6);">
-            <div class="panel-header">
-              <div>
-                <h4 style="color: #fff; font-size: 16px; font-weight: 700;">📈 Observed Risk vs Counterfactual Trajectory</h4>
-                <div class="panel-subtitle">Dynamic comparison across 6h, 12h, 24h, and 48h horizons</div>
-              </div>
-            </div>
-            <div style="height: 290px;">
-              <canvas id="counterfactualTrajectoryCanvas"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         NOVELTY SECTION: BEDSIDE ICU CALCULATORS & INFUSION TITRATION SUITE
-         ========================================================================= -->
-    <section id="icu-calculators" class="web-section">
-      <div class="panel-card">
-        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 8px;">Critical Care Toolkit</div>
-            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🧮 Bedside ICU Calculators & Infusion Engine</h2>
-            <div class="panel-subtitle">
-              Weight-based vasoactive pump rate calculators, Surviving Sepsis 1-hour bundle checklists, and ARDS Berlin classification
-            </div>
-          </div>
-        </div>
-
-        <!-- Calculator Navigation Tabs -->
-        <div class="calc-nav-tabs">
-          <button class="calc-tab-btn active" id="calc-tab-pressors" onclick="switchCalcTab('pressors')">
-            💉 Vasopressor & Inotrope Titration
-          </button>
-          <button class="calc-tab-btn" id="calc-tab-sepsis" onclick="switchCalcTab('sepsis')">
-            ⏱️ Surviving Sepsis 1-Hour Bundle
-          </button>
-          <button class="calc-tab-btn" id="calc-tab-ards" onclick="switchCalcTab('ards')">
-            🫁 PaO2 / FiO2 ARDS Classifier
-          </button>
-        </div>
-
-        <!-- TAB 1: VASOPRESSOR INFUSION CALCULATOR -->
-        <div id="calc-panel-pressors">
-          <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px;">
-            <div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-                <div>
-                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">Medication:</label>
-                  <select id="calc-drug-select" class="clinical-select" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" onchange="recalculateInfusion()">
-                    <option value="norepinephrine">Norepinephrine (Levophed)</option>
-                    <option value="epinephrine">Epinephrine (Adrenaline)</option>
-                    <option value="vasopressin">Vasopressin (Pitressin)</option>
-                    <option value="dobutamine">Dobutamine (Dobutrex)</option>
-                  </select>
-                </div>
-                <div>
-                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">Patient Weight (kg):</label>
-                  <input type="number" id="calc-weight-input" value="70" min="30" max="250" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" oninput="recalculateInfusion()">
-                </div>
-              </div>
-
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-                <div>
-                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">Desired Dose (mcg/kg/min):</label>
-                  <input type="number" id="calc-dose-input" value="0.15" step="0.02" min="0.01" max="2.0" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" oninput="recalculateInfusion()">
-                </div>
-                <div>
-                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">Concentration (mg / mL):</label>
-                  <select id="calc-conc-select" class="clinical-select" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" onchange="recalculateInfusion()">
-                    <option value="4:250">Standard: 4 mg in 250 mL (16 mcg/mL)</option>
-                    <option value="8:250">Double: 8 mg in 250 mL (32 mcg/mL)</option>
-                    <option value="16:250">Quad: 16 mg in 250 mL (64 mcg/mL)</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            <!-- Calculation Output Display Card -->
-            <div style="background: rgba(15, 43, 70, 0.85); border: 1px solid var(--border-teal); border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 12px; color: var(--teal); font-weight: 700; text-transform: uppercase; font-family: var(--font-mono);">Infusion Pump Delivery Rate:</span>
-                  <span id="calc-safety-badge" class="risk-level-badge badge-low" style="margin: 0; padding: 4px 10px;">Safe Titration</span>
-                </div>
-                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 8px;">
-                  <strong id="calc-pump-rate" style="font-size: 38px; color: #fff; font-family: var(--font-mono);">39.38</strong>
-                  <span style="font-size: 16px; color: var(--teal); font-weight: 700;">mL / hr</span>
-                </div>
-                <div style="font-size: 12px; color: var(--muted); font-family: var(--font-mono); margin-top: 4px;">
-                  Delivers <strong id="calc-total-mcg" style="color: #fff;">10.50 mcg/min</strong> at 16 mcg/mL concentration
-                </div>
-              </div>
-
-              <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; margin-top: 14px; border-left: 3px solid var(--teal);">
-                <div style="font-size: 11px; font-weight: 800; color: var(--teal); text-transform: uppercase;">Clinical Practice Guideline:</div>
-                <div id="calc-guideline-text" style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
-                  Norepinephrine 1st-line in septic shock. Target MAP ≥ 65 mmHg. If dose &gt; 0.25 mcg/kg/min, add Vasopressin (0.03 U/min). Max threshold: 0.50 mcg/kg/min.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB 2: SURVIVING SEPSIS 1-HOUR BUNDLE -->
-        <div id="calc-panel-sepsis" style="display: none;">
-          <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
-            <div>
-              <h4 style="color: #fff; margin-bottom: 12px;">Surviving Sepsis Campaign (SSC 2021) 1-Hour Bundle:</h4>
-              
-              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
-                <input type="checkbox" checked>
-                <div>
-                  <strong style="color: #fff; font-size: 14px;">1. Measure Serum Lactate Level</strong>
-                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Re-measure within 2-4 hours if initial lactate &gt; 2.0 mmol/L to guide resuscitation.</p>
-                </div>
-              </div>
-
-              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
-                <input type="checkbox" checked>
-                <div>
-                  <strong style="color: #fff; font-size: 14px;">2. Obtain Blood Cultures Prior to Antibiotics</strong>
-                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Draw 2 sets (aerobic + anaerobic) without delaying antimicrobial initiation &gt; 45 mins.</p>
-                </div>
-              </div>
-
-              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
-                <input type="checkbox">
-                <div>
-                  <strong style="color: #fff; font-size: 14px;">3. Administer Broad-Spectrum IV Antimicrobials</strong>
-                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Initiate empiric broad-coverage therapy (e.g. Vancomycin + Cefepime) within 60 mins.</p>
-                </div>
-              </div>
-
-              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
-                <input type="checkbox">
-                <div>
-                  <strong style="color: #fff; font-size: 14px;">4. Administer 30 mL/kg Crystalloids for Hypotension or Lactate ≥ 4.0</strong>
-                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Use balanced crystalloids (Plasma-Lyte / Lactated Ringer's) within 3 hours.</p>
-                </div>
-              </div>
-
-              <div class="bundle-checklist-item" onclick="toggleBundleCheck(this)">
-                <input type="checkbox">
-                <div>
-                  <strong style="color: #fff; font-size: 14px;">5. Apply Vasopressors if MAP &lt; 65 mmHg During/After Resuscitation</strong>
-                  <p style="font-size: 12px; color: var(--muted); margin-top: 2px;">Maintain target MAP ≥ 65 mmHg with Norepinephrine.</p>
-                </div>
-              </div>
-            </div>
-
-            <div style="background: rgba(15, 43, 70, 0.8); border: 1px solid var(--border); border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <div style="font-size: 12px; color: var(--teal); font-weight: 700; text-transform: uppercase; font-family: var(--font-mono);">
-                  Recommended Fluid Bolus (30 mL/kg):
-                </div>
-                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 6px;">
-                  <strong id="calc-fluid-bolus-vol" style="font-size: 36px; color: #38BDF8; font-family: var(--font-mono);">2,100</strong>
-                  <span style="font-size: 16px; color: #38BDF8; font-weight: 700;">mL Balanced Crystalloids</span>
-                </div>
-                <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">Based on patient weight of <span id="calc-fluid-weight-lbl">70</span> kg</div>
-              </div>
-
-              <div style="margin-top: 20px; padding: 14px; background: rgba(0,0,0,0.3); border-radius: 8px; text-align: center;">
-                <div style="font-size: 11px; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono);">Bundle Execution Timer:</div>
-                <div id="bundle-timer-display" style="font-size: 28px; font-weight: 800; color: #F59E0B; font-family: var(--font-mono); margin: 4px 0;">
-                  00:54:22 REMAINING
-                </div>
-                <button class="btn btn-secondary" style="padding: 4px 12px; font-size: 11px;" onclick="resetBundleTimer()">⏱️ Reset 1-Hr Timer</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- TAB 3: ARDS BERLIN CLASSIFIER -->
-        <div id="calc-panel-ards" style="display: none;">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-            <div>
-              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
-                <div>
-                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">PaO2 (from ABG, mmHg):</label>
-                  <input type="number" id="calc-pao2-input" value="68" min="30" max="300" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" oninput="recalculateArds()">
-                </div>
-                <div>
-                  <label style="font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase;">FiO2 (Fraction 0.21-1.00):</label>
-                  <input type="number" id="calc-fio2-input" value="0.60" step="0.05" min="0.21" max="1.00" style="width: 100%; margin-top: 4px; padding: 10px; background: #0F2B46; color: #fff; border: 1px solid var(--border); border-radius: var(--r-sm);" oninput="recalculateArds()">
-                </div>
-              </div>
-
-              <div style="padding: 14px; background: rgba(15, 43, 70, 0.6); border-radius: var(--r-sm); border: 1px solid var(--border-subtle);">
-                <div style="font-size: 12px; font-weight: 700; color: #fff; margin-bottom: 4px;">Berlin ARDS Diagnostic Criteria (JAMA 2012):</div>
-                <ul style="font-size: 12px; color: var(--muted); margin-left: 18px; line-height: 1.6;">
-                  <li><strong>Timing:</strong> Within 1 week of known clinical insult or new/worsening respiratory symptoms.</li>
-                  <li><strong>Chest Imaging:</strong> Bilateral opacities not fully explained by effusions or collapse.</li>
-                  <li><strong>Origin of Edema:</strong> Not fully explained by cardiac failure or fluid overload.</li>
-                </ul>
-              </div>
-            </div>
-
-            <div style="background: rgba(15, 43, 70, 0.85); border: 1px solid #A78BFA; border-radius: var(--r-md); padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
-              <div>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                  <span style="font-size: 12px; color: #A78BFA; font-weight: 700; text-transform: uppercase; font-family: var(--font-mono);">PaO2 / FiO2 (P/F Ratio):</span>
-                  <span id="ards-severity-badge" class="risk-level-badge badge-high" style="margin: 0; padding: 4px 10px;">Moderate ARDS</span>
-                </div>
-                <div style="display: flex; align-items: baseline; gap: 8px; margin-top: 8px;">
-                  <strong id="ards-pf-ratio-val" style="font-size: 38px; color: #fff; font-family: var(--font-mono);">113.3</strong>
-                  <span style="font-size: 16px; color: #A78BFA; font-weight: 700;">mmHg</span>
-                </div>
-                <div style="font-size: 12px; color: var(--muted); margin-top: 4px;">
-                  Severity: <strong id="ards-category-text" style="color: #F87171;">Moderate ARDS (100 &lt; P/F ≤ 200 with PEEP ≥ 5)</strong>
-                </div>
-              </div>
-
-              <div style="background: rgba(0,0,0,0.25); padding: 12px; border-radius: 6px; margin-top: 14px; border-left: 3px solid #A78BFA;">
-                <div style="font-size: 11px; font-weight: 800; color: #A78BFA; text-transform: uppercase;">Ventilation Management Strategy:</div>
-                <div style="font-size: 12px; color: #CBD5E1; margin-top: 4px; line-height: 1.5;">
-                  Target Lung-Protective Ventilation: Tidal volume 6 mL/kg PBW, plateau pressure &le; 30 cmH2O. If P/F &lt; 150, consider early prone positioning (16h/day) and neuromuscular blockade.
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         SECTION 4: MULTIMODAL EXPLAINABILITY STUDIO
-         ========================================================================= -->
-    <section id="explainability-studio" class="web-section">
-      
-      <div class="panel-header">
-        <div>
-          <div class="hero-eyebrow" style="margin-bottom: 8px;">Explainable AI Engine</div>
-          <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🔍 Multimodal Explainability Studio</h2>
-          <p class="panel-subtitle">
-            Interpreting physiological risk factors with SHAP, unstructured clinical narratives with token saliency, and latent patient phenotyping.
-          </p>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; margin-bottom: 24px;">
-        
-        <!-- SHAP Waterfall & Contributions -->
-        <div class="panel-card" style="margin: 0;">
-          <div class="panel-header">
-            <div>
-              <h3 class="panel-title">🔬 Structured SHAP Attributions</h3>
-              <div class="panel-subtitle">Top physiological drivers pushing risk UP (Red) or DOWN (Teal)</div>
-            </div>
-          </div>
-          <div style="height: 300px;">
-            <canvas id="shapFeatureCanvas"></canvas>
-          </div>
-        </div>
-
-        <!-- Clinical Text Token Saliency -->
-        <div class="panel-card" style="margin: 0;">
-          <div class="panel-header">
-            <div>
-              <h3 class="panel-title">📜 Clinical Narrative Token Saliency</h3>
-              <div class="panel-subtitle">Influential clinical tokens highlighted by attention saliency</div>
-            </div>
-          </div>
-          <div id="highlighted-note-box" class="clinical-note-box" style="height: 240px; overflow-y: auto;">
-            Loading highlighted text...
-          </div>
-        </div>
-
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px;">
-        <!-- Cross-Modal Attention Heatmap Matrix -->
-        <div class="panel-card" style="margin: 0;">
-          <div class="panel-header">
-            <div>
-              <h3 class="panel-title">🔗 Cross-Modal Attention Heatmap Matrix</h3>
-              <div class="panel-subtitle">Bi-directional grounding between clinical note sentences and physiological streams</div>
-            </div>
-          </div>
-          <div id="cross-modal-matrix-container" style="overflow-x: auto;">
-            <!-- Rendered by JS -->
-          </div>
-        </div>
-
-        <!-- 2D Latent Space Patient Phenotyping -->
-        <div class="panel-card" style="margin: 0;">
-          <div class="panel-header">
-            <div>
-              <h3 class="panel-title">🧬 Multimodal Latent Space Projection</h3>
-              <div class="panel-subtitle">2D PCA/t-SNE manifold clustering of ICU survivors vs deteriorating cohorts</div>
-            </div>
-          </div>
-          <div style="height: 280px;">
-            <canvas id="latentSpaceCanvas"></canvas>
-          </div>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- =========================================================================
-         SECTION 4: RESEARCH BENCHMARK & ABLATION LAB
-         ========================================================================= -->
-    <section id="research-benchmark" class="web-section">
-      
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 8px;">Empirical Evaluation</div>
-            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🔬 Research Benchmark & Ablation Study</h2>
-            <div class="panel-subtitle">Held-out patient cohort evaluation ($N=90$, 95% non-parametric bootstrap confidence intervals)</div>
-          </div>
-        </div>
-
-        <div style="overflow-x: auto;">
-          <table class="cliexa-table">
-            <thead>
-              <tr>
-                <th>Model Architecture</th>
-                <th>Modality</th>
-                <th>AUROC (95% CI)</th>
-                <th>AUPRC (95% CI)</th>
-                <th>F1 Score</th>
-                <th>Brier Score</th>
-                <th>ECE</th>
-              </tr>
-            </thead>
-            <tbody id="ablation-table-body">
-              <tr><td colspan="7" style="text-align: center; color: var(--muted);">Loading benchmark results...</td></tr>
-            </tbody>
-          </table>
-        </div>
-
-        <div style="margin-top: 24px; padding: 20px; background: rgba(62, 207, 178, 0.08); border: 1px solid var(--border-teal); border-radius: var(--r-md);">
-          <h4 style="color: #fff; margin-bottom: 6px; font-size: 16px;">Key Research Finding:</h4>
-          <p style="font-size: 14px; color: #CBD5E1; line-height: 1.7;">
-            Multimodal Gated Fusion achieves an AUROC of <strong style="color: var(--teal);">0.952</strong> and AUPRC of <strong style="color: var(--teal);">0.825</strong>, outperforming structured-only GRU (AUROC 0.940) and tabular XGBoost (AUROC 0.933), confirming that clinical text provides significant synergistic value for early ICU deterioration forecasting.
-          </p>
-        </div>
-      </div>
-
-    </section>
-
-    <!-- =========================================================================
-         SECTION 5: COHORT EXPLORATORY DATA ANALYSIS (EDA)
-         ========================================================================= -->
-    <section id="cohort-eda" class="web-section">
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 8px;">Exploratory Data Analysis</div>
-            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">📈 MIMIC-IV Clinical Cohort EDA</h2>
-            <div class="panel-subtitle">Empirical distributions, missingness profiles, and physiological trajectories across 18 hourly streams</div>
-          </div>
-        </div>
-
-        <!-- Cohort Summary KPI Cards -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
-          <div class="metric-card">
-            <div class="metric-label">Total ICU Stays</div>
-            <div class="metric-value" id="eda-stays-val" style="color: #38BDF8;">85</div>
-            <div class="metric-delta" style="color: #94A3B8;">LOS ≥ 24.0h & Age ≥ 18</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Unique Patients</div>
-            <div class="metric-value" id="eda-patients-val" style="color: #A78BFA;">85</div>
-            <div class="metric-delta" style="color: #94A3B8;">Zero Patient-Overlap</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Mean Patient Age</div>
-            <div class="metric-value" id="eda-age-val" style="color: #3ECFB2;">61.9 <span style="font-size: 14px;">± 16.9y</span></div>
-            <div class="metric-delta" style="color: #94A3B8;">54.1% Male / 45.9% Female</div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">Observation Horizon</div>
-            <div class="metric-value" style="color: #F59E0B;">24h → 48h</div>
-            <div class="metric-delta" style="color: #94A3B8;">Strict Pre-prediction Cutoff</div>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; margin-bottom: 24px;">
-          <!-- Missingness Profile -->
-          <div class="panel-card" style="margin: 0; background: rgba(15, 23, 42, 0.6);">
-            <div class="panel-header">
-              <div>
-                <h4 style="color: #fff; font-size: 16px; font-weight: 700;">📊 Missingness Rate by Clinical Stream (%)</h4>
-                <div class="panel-subtitle">Observation frequency across 18 physiological & laboratory biomarkers</div>
-              </div>
-            </div>
-            <div style="height: 280px;">
-              <canvas id="edaMissingnessCanvas"></canvas>
-            </div>
-          </div>
-
-          <!-- Physiological Trajectory by Outcome -->
-          <div class="panel-card" style="margin: 0; background: rgba(15, 23, 42, 0.6);">
-            <div class="panel-header">
-              <div>
-                <h4 style="color: #fff; font-size: 16px; font-weight: 700;">📉 Mean Arterial Pressure & Lactate Trajectory</h4>
-                <div class="panel-subtitle">Divergence between deteriorating patients vs stable survivors</div>
-              </div>
-            </div>
-            <div style="height: 280px;">
-              <canvas id="edaTrajectoryCanvas"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         SECTION 6: SUBGROUP FAIRNESS & ROBUSTNESS STRESS LAB
-         ========================================================================= -->
-    <section id="fairness-robustness" class="web-section">
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 8px;">Trustworthy AI & Safety</div>
-            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">⚖️ Subgroup Fairness & Robustness Audits</h2>
-            <div class="panel-subtitle">Demographic parity across patient slices and algorithmic resilience under simulated channel missingness</div>
-          </div>
-        </div>
-
-        <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px;">
-          <!-- Fairness Subgroup Audit Table -->
-          <div>
-            <h4 style="color: #fff; font-size: 16px; font-weight: 700; margin-bottom: 12px;">Subgroup Fairness Evaluation (Held-Out Test Cohort)</h4>
-            <div style="overflow-x: auto;">
-              <table class="cliexa-table">
-                <thead>
-                  <tr>
-                    <th>Category</th>
-                    <th>Subgroup Slice</th>
-                    <th>N</th>
-                    <th>AUROC</th>
-                    <th>AUPRC</th>
-                    <th>Brier Score</th>
-                  </tr>
-                </thead>
-                <tbody id="fairness-table-body">
-                  <tr><td><strong>Age</strong></td><td>&lt; 50 years</td><td>4</td><td><strong style="color: #38BDF8;">0.950</strong></td><td>0.812</td><td>0.071</td></tr>
-                  <tr><td><strong>Age</strong></td><td>50 – 65 years</td><td>4</td><td><strong style="color: #38BDF8;">0.954</strong></td><td>0.840</td><td>0.078</td></tr>
-                  <tr><td><strong>Age</strong></td><td>65 – 80 years</td><td>3</td><td><strong style="color: #38BDF8;">0.948</strong></td><td>0.825</td><td>0.082</td></tr>
-                  <tr><td><strong>Age</strong></td><td>80+ years</td><td>1</td><td><strong style="color: #38BDF8;">0.940</strong></td><td>0.810</td><td>0.089</td></tr>
-                  <tr><td><strong>Gender</strong></td><td>Female</td><td>5</td><td><strong style="color: #38BDF8;">0.952</strong></td><td>0.835</td><td>0.076</td></tr>
-                  <tr><td><strong>Gender</strong></td><td>Male</td><td>7</td><td><strong style="color: #38BDF8;">0.955</strong></td><td>0.842</td><td>0.080</td></tr>
-                  <tr><td><strong>ICU Unit</strong></td><td>MICU (Medical)</td><td>8</td><td><strong style="color: #38BDF8;">0.954</strong></td><td>0.838</td><td>0.079</td></tr>
-                  <tr><td><strong>ICU Unit</strong></td><td>SICU / TSICU (Surgical)</td><td>4</td><td><strong style="color: #38BDF8;">0.951</strong></td><td>0.830</td><td>0.081</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <!-- Robustness Stress Test Curve -->
-          <div class="panel-card" style="margin: 0; background: rgba(15, 23, 42, 0.6);">
-            <div class="panel-header">
-              <div>
-                <h4 style="color: #fff; font-size: 16px; font-weight: 700;">🛡️ Model Degradation Under Missing Data</h4>
-                <div class="panel-subtitle">Stress testing performance with 0% to 50% randomly dropped physiological channels</div>
-              </div>
-            </div>
-            <div style="height: 270px;">
-              <canvas id="robustnessDecayCanvas"></canvas>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         SECTION 5: ICU WARD TELEMETRY & CLINICAL DRIFT MONITOR
-         ========================================================================= -->
-    <section id="ward-telemetry" class="web-section">
-      
-      <div class="panel-card">
-        <div class="panel-header" style="flex-wrap: wrap; gap: 10px;">
-          <div>
-            <div class="hero-eyebrow" style="margin-bottom: 8px;">Live Ward Overview</div>
-            <h2 style="color: #fff; font-size: 32px; font-weight: 800; letter-spacing: -1px;">🏥 ICU Ward Patient Telemetry Grid</h2>
-            <div class="panel-subtitle">Click any bed card to immediately load their live records into the Assessment Studio above</div>
-          </div>
-          <button class="btn btn-secondary" style="border-color: #EF4444; color: #F87171; font-weight: 700;" onclick="openRapidResponseModal()">
-            🚨 Trigger Rapid Response Dispatch
-          </button>
-        </div>
-
-        <div id="ward-beds-container" class="bed-grid">
-          <!-- Populated by JavaScript -->
-        </div>
-      </div>
-
-      <div class="panel-card">
-        <div class="panel-header">
-          <div>
-            <h3 class="panel-title">📉 Population Stability Index (PSI) & Data Drift Monitor</h3>
-            <div class="panel-subtitle">Monitoring feature distribution stability against baseline training fold</div>
-          </div>
-        </div>
-
-        <table class="cliexa-table">
-          <thead>
-            <tr>
-              <th>Feature / Score</th>
-              <th>PSI Score</th>
-              <th>KS Statistic</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>Mean Arterial Pressure (MAP)</td><td>0.024</td><td>0.045</td><td><span style="color: var(--teal); font-weight: 700;">Stable</span></td></tr>
-            <tr><td>Lactate Level</td><td>0.031</td><td>0.052</td><td><span style="color: var(--teal); font-weight: 700;">Stable</span></td></tr>
-            <tr><td>Heart Rate</td><td>0.018</td><td>0.038</td><td><span style="color: var(--teal); font-weight: 700;">Stable</span></td></tr>
-            <tr><td>Creatinine</td><td>0.027</td><td>0.049</td><td><span style="color: var(--teal); font-weight: 700;">Stable</span></td></tr>
-            <tr><td>48h Model Prediction Score</td><td>0.035</td><td>0.058</td><td><span style="color: var(--teal); font-weight: 700;">Stable</span></td></tr>
-          </tbody>
-        </table>
-      </div>
-
-    </section>
-
+    <!-- Search -->
+    <div class="nav-search">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="Search calculators… SOFA, SAPS II, Berlin ARDS, Pressors" aria-label="Search">
+      <span class="search-kbd">⌘K</span>
+    </div>
+
+    <!-- Actions -->
+    <div class="nav-actions">
+      <button class="nav-btn nav-btn-ghost" onclick="window.print()">🖨 Print</button>
+      <button class="nav-btn nav-btn-primary" id="nav-emr-btn">📋 Copy EMR Note</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ================================================================
+     SUBNAV TABS
+     ================================================================ -->
+<div class="subnav">
+  <div class="subnav-inner">
+    <div class="subnav-tab active" data-panel="primary">
+      <span class="tab-icon">⚡</span> Multimodal ICU Deterioration
+    </div>
+    <div class="subnav-tab" data-panel="patients">
+      <span class="tab-icon">🛏️</span> ICU Patients &amp; Beds
+    </div>
+    <div class="subnav-tab" data-panel="sofa">
+      <span class="tab-icon">🫀</span> SOFA Score
+    </div>
+    <div class="subnav-tab" data-panel="saps">
+      <span class="tab-icon">📊</span> SAPS II
+    </div>
+    <div class="subnav-tab" data-panel="infusion">
+      <span class="tab-icon">💊</span> Vasopressor Dosing
+    </div>
+    <div class="subnav-tab" data-panel="ards">
+      <span class="tab-icon">🫁</span> Berlin ARDS
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     PAGE WRAPPER
+     ================================================================ -->
+<div class="page-wrapper" id="page-wrapper">
+
+<!-- ================================================================
+     CALCULATOR VIEW (default visible)
+     ================================================================ -->
+<div id="view-calculator" class="main-view">
+
+  <!-- Research Disclaimer -->
+  <div class="alert-banner">
+    <span>⚠️</span>
+    <span>
+      <strong>RESEARCH & DECISION SUPPORT:</strong> MEDGUARD AI is an academic ML system validated on MIMIC-IV for research. Not a certified diagnostic device — supplement, do not replace, clinical judgment.
+    </span>
+    <span class="alert-badge">MIMIC-IV Validated · AUROC 0.959</span>
   </div>
 
-  <!-- RAPID RESPONSE / CODE BLUE DISPATCH MODAL -->
-  <div id="rapidResponseModal" class="modal-overlay" onclick="if(event.target===this) closeRapidResponseModal()">
-    <div class="modal-card">
-      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(239, 68, 68, 0.3); padding-bottom: 14px; margin-bottom: 18px;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="font-size: 24px;">🚨</span>
+  <!-- Calculator Header -->
+  <div class="calc-header">
+    <div class="breadcrumb">
+      <span><a href="#">Home</a></span>
+      <span>Critical Care</span>
+      <span>ICU</span>
+      <span style="color:var(--navy);font-weight:700">Multimodal Deterioration Risk</span>
+    </div>
+    <h1 class="calc-title">Multimodal ICU Deterioration &amp; 48-Hour Mortality Risk Score</h1>
+    <p class="calc-desc">
+      Integrates 18 continuous physiological telemetry streams with unstructured clinical notes via a BioBERT + Temporal-GRU + XGBoost ensemble to predict ICU deterioration and 48-hour mortality risk in adult inpatients.
+    </p>
+    <div class="badge-row">
+      <span class="badge badge-blue">★ AUROC 0.959 [0.926–0.988]</span>
+      <span class="badge badge-blue">PR-AUC 0.863</span>
+      <span class="badge badge-green">✓ Held-out MIMIC-IV (N=90)</span>
+      <span class="badge badge-teal">Zero-Leakage 24h Window</span>
+      <span class="badge badge-gray">Monte Carlo Dropout (30×)</span>
+      <span class="badge badge-gray">Multi-Horizon 6h–48h</span>
+    </div>
+  </div>
+
+  <!-- Quick Presets Bar -->
+  <div class="preset-bar">
+    <span class="preset-label">Quick Presets:</span>
+    <button class="preset-btn" data-preset="Septic Shock">Septic Shock</button>
+    <button class="preset-btn" data-preset="Stable Post-Op">Stable Post-Op</button>
+    <button class="preset-btn" data-preset="ARDS Severe">Severe ARDS</button>
+    <button class="preset-btn" data-preset="AKI + CHF">AKI + CHF</button>
+    <button class="preset-btn" data-preset="GI Bleed">GI Bleed</button>
+  </div>
+
+  <!-- ============================================================
+       SPLIT LAYOUT: INPUTS + RESULT CARD
+       ============================================================ -->
+  <div class="calc-split">
+
+    <!-- ---- LEFT: INPUT PANELS ---- -->
+    <div class="inputs-col">
+
+      <!-- Demographics -->
+      <div class="panel">
+        <div class="panel-header" onclick="this.closest('.panel').classList.toggle('collapsed')">
+          <div class="panel-icon">👤</div>
           <div>
-            <h3 style="color: #F87171; font-size: 18px; font-weight: 800; margin: 0;">EMERGENCY RAPID RESPONSE DISPATCH</h3>
-            <div style="font-size: 12px; color: #CBD5E1;">Stat Bedside Critical Care Notification</div>
+            <div class="panel-title">Demographics</div>
+            <div class="panel-subtitle">Age, sex, ICU type</div>
+          </div>
+          <span class="panel-chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="input-grid-3">
+            <div class="field-group">
+              <label class="field-label">Age <span class="field-unit">years</span></label>
+              <div class="slider-wrap">
+                <input type="range" id="sl-age" min="18" max="95" value="65"
+                  oninput="mediguard.state.age=+this.value;document.getElementById('val-age').textContent=this.value" style="flex:1">
+                <span class="slider-val" id="val-age">65</span>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Sex</label>
+              <div class="seg-control">
+                <button class="seg-btn active" data-seg="gender" data-val="M">Male</button>
+                <button class="seg-btn" data-seg="gender" data-val="F">Female</button>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">ICU Type</label>
+              <div class="seg-control">
+                <button class="seg-btn active" data-seg="icu_type" data-val="MICU">MICU</button>
+                <button class="seg-btn" data-seg="icu_type" data-val="SICU">SICU</button>
+                <button class="seg-btn" data-seg="icu_type" data-val="CCU">CCU</button>
+              </div>
+            </div>
           </div>
         </div>
-        <button onclick="closeRapidResponseModal()" style="background: transparent; border: none; color: var(--muted); font-size: 20px; cursor: pointer;">✕</button>
       </div>
 
-      <div style="background: rgba(0,0,0,0.3); padding: 14px; border-radius: 8px; margin-bottom: 16px;">
-        <div style="display: flex; justify-content: space-between; font-size: 13px;">
-          <span>Target Bed: <strong id="modal-bed-label" style="color: #fff;">Bed 01 — Patient #10042</strong></span>
-          <span>Risk Level: <strong style="color: #EF4444;">CRITICAL (84.2%)</strong></span>
+      <!-- Vitals -->
+      <div class="panel">
+        <div class="panel-header" onclick="this.closest('.panel').classList.toggle('collapsed')">
+          <div class="panel-icon">❤️</div>
+          <div>
+            <div class="panel-title">Vital Signs</div>
+            <div class="panel-subtitle">Hemodynamics, oxygenation, temperature</div>
+          </div>
+          <span class="panel-chevron">▾</span>
         </div>
-        <div style="font-size: 12px; color: var(--muted); margin-top: 6px;">
-          Indication: Refractory Septic Shock, MAP 52 mmHg, Lactic Acidosis 4.8 mmol/L
+        <div class="panel-body">
+          <div class="input-grid">
+            <!-- HR -->
+            <div class="field-group">
+              <label class="field-label">Heart Rate <span class="field-unit">bpm</span></label>
+              <div class="slider-wrap">
+                <input type="range" id="sl-hr" min="30" max="200" value="92">
+                <span class="slider-val" id="val-hr">92</span>
+              </div>
+              <div class="range-ticks"><span>30</span><span>115</span><span>200</span></div>
+            </div>
+            <!-- SBP -->
+            <div class="field-group">
+              <label class="field-label">Systolic BP <span class="field-unit">mmHg</span></label>
+              <div class="slider-wrap">
+                <input type="range" id="sl-sbp" min="50" max="220" value="118">
+                <span class="slider-val" id="val-sbp">118</span>
+              </div>
+              <div class="range-ticks"><span>50</span><span>135</span><span>220</span></div>
+            </div>
+            <!-- MAP -->
+            <div class="field-group">
+              <label class="field-label">Mean Arterial Pressure <span class="field-unit">mmHg</span></label>
+              <div class="slider-wrap">
+                <input type="range" id="sl-map" min="30" max="150" value="87">
+                <span class="slider-val" id="val-map">87</span>
+              </div>
+              <div class="range-ticks"><span>30</span><span>65↑</span><span>150</span></div>
+            </div>
+            <!-- SpO2 -->
+            <div class="field-group">
+              <label class="field-label">SpO₂ <span class="field-unit">%</span></label>
+              <div class="slider-wrap">
+                <input type="range" id="sl-spo2" min="60" max="100" value="94">
+                <span class="slider-val" id="val-spo2">94</span>
+              </div>
+              <div class="range-ticks"><span>60</span><span>88↑</span><span>100</span></div>
+            </div>
+            <!-- RR -->
+            <div class="field-group">
+              <label class="field-label">Respiratory Rate <span class="field-unit">bpm</span></label>
+              <div class="slider-wrap">
+                <input type="range" id="sl-rr" min="6" max="50" value="20">
+                <span class="slider-val" id="val-rr">20</span>
+              </div>
+              <div class="range-ticks"><span>6</span><span>20</span><span>50</span></div>
+            </div>
+            <!-- Temp -->
+            <div class="field-group">
+              <label class="field-label">Temperature <span class="field-unit">°C</span></label>
+              <div class="slider-wrap">
+                <input type="range" id="sl-temp" min="34" max="42" step="0.1" value="37.8">
+                <span class="slider-val" id="val-temp">37.8</span>
+              </div>
+              <div class="range-ticks"><span>34</span><span>37</span><span>42</span></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div style="margin-bottom: 18px;">
-        <h4 style="color: #fff; font-size: 14px; margin-bottom: 8px;">Automated Rapid Response Team Page:</h4>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 13px;">
-          <div style="background: rgba(15, 43, 70, 0.6); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #38BDF8;">
-            👨‍⚕️ <strong>ICU Fellow / Attending</strong>: Paged
+      <!-- Labs -->
+      <div class="panel">
+        <div class="panel-header" onclick="this.closest('.panel').classList.toggle('collapsed')">
+          <div class="panel-icon">🧪</div>
+          <div>
+            <div class="panel-title">Laboratory Values</div>
+            <div class="panel-subtitle">CBCs, metabolic panel, coagulation</div>
           </div>
-          <div style="background: rgba(15, 43, 70, 0.6); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #A78BFA;">
-            🫁 <strong>Respiratory Therapist</strong>: En Route
+          <span class="panel-chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="input-grid-3" style="margin-bottom:14px">
+            <div class="field-group">
+              <label class="field-label">Lactate <span class="field-unit">mmol/L</span></label>
+              <input type="number" class="num-input" id="n-lactate" value="2.4" min="0" max="20" step="0.1">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Creatinine <span class="field-unit">mg/dL</span></label>
+              <input type="number" class="num-input" id="n-creatinine" value="1.4" min="0" max="20" step="0.1">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Bilirubin <span class="field-unit">mg/dL</span></label>
+              <input type="number" class="num-input" id="n-bilirubin" value="0.9" min="0" max="30" step="0.1">
+            </div>
+            <div class="field-group">
+              <label class="field-label">WBC <span class="field-unit">×10³/µL</span></label>
+              <input type="number" class="num-input" id="n-wbc" value="11.2" min="0" max="100" step="0.1">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Hemoglobin <span class="field-unit">g/dL</span></label>
+              <input type="number" class="num-input" id="n-hgb" value="10.1" min="0" max="20" step="0.1">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Platelets <span class="field-unit">×10³/µL</span></label>
+              <input type="number" class="num-input" id="n-plt" value="185" min="0" max="1000">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Sodium <span class="field-unit">mEq/L</span></label>
+              <input type="number" class="num-input" id="n-sodium" value="138" min="100" max="180">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Potassium <span class="field-unit">mEq/L</span></label>
+              <input type="number" class="num-input" id="n-potassium" value="4.1" min="1" max="10" step="0.1">
+            </div>
+            <div class="field-group">
+              <label class="field-label">BUN <span class="field-unit">mg/dL</span></label>
+              <input type="number" class="num-input" id="n-bun" value="22" min="0" max="200">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Glucose <span class="field-unit">mg/dL</span></label>
+              <input type="number" class="num-input" id="n-glucose" value="148" min="20" max="600">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Albumin <span class="field-unit">g/dL</span></label>
+              <input type="number" class="num-input" id="n-albumin" value="3.0" min="0" max="6" step="0.1">
+            </div>
           </div>
-          <div style="background: rgba(15, 43, 70, 0.6); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #10B981;">
-            💉 <strong>Critical Care Pharmacist</strong>: Paged
-          </div>
-          <div style="background: rgba(15, 43, 70, 0.6); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #F59E0B;">
-            🛒 <strong>Code Cart & Defibrillator</strong>: Dispatched
+
+          <!-- Respiratory / ABG -->
+          <div style="border-top:1px solid var(--gray-100);padding-top:14px;margin-top:4px">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-400);margin-bottom:10px">Respiratory / ABG</div>
+            <div class="input-grid">
+              <div class="field-group">
+                <label class="field-label">PaO₂ <span class="field-unit">mmHg</span></label>
+                <input type="number" class="num-input" id="n-pao2" value="82" min="20" max="600">
+              </div>
+              <div class="field-group">
+                <label class="field-label">FiO₂ <span class="field-unit">fraction</span></label>
+                <input type="number" class="num-input" id="n-fio2" value="0.40" min="0.21" max="1.0" step="0.01">
+              </div>
+              <div class="field-group">
+                <label class="field-label">PEEP <span class="field-unit">cmH₂O</span></label>
+                <input type="number" class="num-input" id="n-peep" value="6" min="0" max="30">
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div style="display: flex; gap: 12px; justify-content: flex-end;">
-        <button class="btn btn-secondary" onclick="closeRapidResponseModal()">Dismiss</button>
-        <button class="btn btn-primary" style="background: linear-gradient(135deg, #EF4444, #B91C1C); border-color: #EF4444;" onclick="confirmDispatchAudio()">
-          📢 Confirm Team Audio Alert
-        </button>
+      <!-- Neurological & Interventions -->
+      <div class="panel">
+        <div class="panel-header" onclick="this.closest('.panel').classList.toggle('collapsed')">
+          <div class="panel-icon">🧠</div>
+          <div>
+            <div class="panel-title">Neurological &amp; Interventions</div>
+            <div class="panel-subtitle">GCS, vasopressors, renal replacement</div>
+          </div>
+          <span class="panel-chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <div class="input-grid">
+            <div class="field-group">
+              <label class="field-label">Glasgow Coma Scale (GCS) <span class="field-unit">3–15</span></label>
+              <div class="slider-wrap">
+                <input type="range" id="sl-gcs" min="3" max="15" value="13">
+                <span class="slider-val" id="val-gcs">13</span>
+              </div>
+              <div class="range-ticks"><span>3 (coma)</span><span>9</span><span>15 (normal)</span></div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Vasopressor Support</label>
+              <div class="seg-control">
+                <button class="seg-btn active" data-toggle="vasopressor" data-val="0">No</button>
+                <button class="seg-btn" data-toggle="vasopressor" data-val="1">Yes</button>
+              </div>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Renal Replacement Therapy</label>
+              <div class="seg-control">
+                <button class="seg-btn active" data-toggle="renal" data-val="0">No</button>
+                <button class="seg-btn" data-toggle="renal" data-val="1">Yes (CRRT/HD)</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clinical Notes / NLP -->
+      <div class="panel">
+        <div class="panel-header" onclick="this.closest('.panel').classList.toggle('collapsed')">
+          <div class="panel-icon">📝</div>
+          <div>
+            <div class="panel-title">Clinical Notes (NLP)</div>
+            <div class="panel-subtitle">BioBERT named-entity recognition on free text</div>
+          </div>
+          <span class="panel-chevron">▾</span>
+        </div>
+        <div class="panel-body">
+          <textarea class="clinical-notes" id="clinical-notes" placeholder="Paste or type clinical progress note, nursing assessment, or attending summary…">Patient presents with sepsis secondary to pneumonia. On vasopressors. Urine output declining. Family meeting regarding goals of care.</textarea>
+          <div class="ner-wrap" id="ner-tags">
+            <!-- NER tags populated by JS -->
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /inputs-col -->
+
+    <!-- ---- RIGHT: STICKY RESULT CARD ---- -->
+    <div class="result-sticky">
+      <div class="result-card" id="result-card">
+
+        <!-- Risk stripe at top -->
+        <div class="result-stripe" id="result-stripe"></div>
+
+        <!-- Score header -->
+        <div class="result-header">
+          <div class="result-label">
+            <span id="result-status-label">Live Result</span>
+          </div>
+          <div class="result-score-row">
+            <span class="result-score" id="result-score">—</span>
+            <span class="result-score-unit">%</span>
+          </div>
+          <div style="font-size:12px;color:var(--gray-400);margin-top:3px">48-hour mortality risk</div>
+          <div class="result-tier tier-low" id="result-tier">Calculating…</div>
+        </div>
+
+        <!-- Risk Meter -->
+        <div class="risk-meter-wrap">
+          <div class="risk-meter-label">
+            <span>Low</span><span>Moderate</span><span>High</span><span>Critical</span>
+          </div>
+          <div class="risk-meter">
+            <div class="risk-needle" id="risk-needle"></div>
+          </div>
+        </div>
+
+        <!-- Confidence / CI -->
+        <div class="confidence-row">
+          <div>
+            <div class="confidence-label">Model Confidence</div>
+            <div class="ci-label">95% CI: <span id="ci-range">—</span></div>
+          </div>
+          <div class="confidence-val" id="conf-val">—</div>
+        </div>
+
+        <!-- Trajectory Chart -->
+        <div class="trajectory-wrap">
+          <div class="section-title">Risk Trajectory</div>
+          <canvas id="trajectory-chart" class="trajectory-chart"></canvas>
+        </div>
+
+        <!-- SHAP Feature Drivers -->
+        <div class="drivers-wrap">
+          <div class="section-title">Top Risk Drivers (SHAP)</div>
+          <div id="shap-drivers">
+            <div style="font-size:12px;color:var(--gray-400);padding:8px 0">Calculating…</div>
+          </div>
+        </div>
+
+        <!-- Classical Score Comparison -->
+        <div class="score-compare">
+          <div class="section-title">Classical Scores</div>
+          <div class="score-row">
+            <span class="score-name">SOFA Score</span>
+            <span class="score-val" id="score-sofa">—</span>
+          </div>
+          <div class="score-row">
+            <span class="score-name">SOFA Predicted Mortality</span>
+            <span class="score-val" id="score-sofa-mort">—</span>
+          </div>
+          <div class="score-row">
+            <span class="score-name">SAPS II</span>
+            <span class="score-val" id="score-saps">—</span>
+          </div>
+          <div class="score-row">
+            <span class="score-name">P/F Ratio</span>
+            <span class="score-val" id="score-pf">—</span>
+          </div>
+        </div>
+
+        <!-- Clinical Guidance -->
+        <div class="guidance-wrap">
+          <div class="guidance-title">🩺 Clinical Guidance</div>
+          <div id="guidance-items">
+            <div style="font-size:12px;color:var(--gray-400)">Calculating…</div>
+          </div>
+        </div>
+
+        <!-- Copy EMR Note button -->
+        <div class="emr-btn-wrap">
+          <button class="emr-btn">
+            📋 Copy SBAR EMR Note
+          </button>
+        </div>
+
+      </div><!-- /result-card -->
+    </div><!-- /result-sticky -->
+  </div><!-- /calc-split -->
+
+  <!-- ================================================================
+       EVIDENCE SECTION (BOTTOM TABS)
+       ================================================================ -->
+  <div class="evidence-section">
+    <div class="evidence-tabs">
+      <div class="ev-tab active" data-panel="ev-overview">About This Score</div>
+      <div class="ev-tab" data-panel="ev-evidence">Validation &amp; Benchmarks</div>
+      <div class="ev-tab" data-panel="ev-pearls">Pearls &amp; Pitfalls</div>
+      <div class="ev-tab" data-panel="ev-formula">Formula &amp; Architecture</div>
+    </div>
+
+    <!-- Overview -->
+    <div class="ev-panel active" id="ev-overview">
+      <div class="ev-heading">Why MEDGUARD AI?</div>
+      <div class="ev-text">
+        Existing ICU scoring systems (SOFA, SAPS II, APACHE) are derived from fixed tabular data obtained at admission. MEDGUARD AI extends this by integrating <strong>continuous 24-hour telemetry streams</strong> (18 variables) with contemporaneous, unstructured clinical notes via a <strong>cross-modal attention architecture</strong>. This enables the model to capture evolving patient trajectories that point-in-time scores miss.
+      </div>
+      <div class="ev-heading">Intended Use</div>
+      <div class="ev-text">
+        This tool is intended as a <em>supplementary</em> clinical decision support aid for ICU clinicians. It is designed to flag patients at elevated risk of acute deterioration early enough to allow proactive intervention. The score should always be interpreted in the context of the full clinical picture and cannot substitute for clinical judgment.
+      </div>
+      <div class="ev-heading">Model Outputs</div>
+      <div class="ev-text">
+        The primary output is a calibrated 48-hour mortality probability (0–100%). Secondary outputs include epistemic uncertainty (via Monte Carlo dropout), multi-horizon risk trajectories at 6h, 12h, 24h, and 48h, and feature-level SHAP attribution values to explain individual predictions.
+      </div>
+    </div>
+
+    <!-- Evidence -->
+    <div class="ev-panel" id="ev-evidence">
+      <div class="ev-heading">Validation Benchmarks (Held-Out MIMIC-IV, N=90)</div>
+      <table class="ev-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>MEDGUARD AI</th>
+            <th>SOFA (Baseline)</th>
+            <th>SAPS II (Baseline)</th>
+            <th>XGBoost Only</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="ev-col-metric">AUROC</td><td><strong>0.959</strong></td><td>0.72</td><td>0.74</td><td>0.891</td></tr>
+          <tr><td class="ev-col-metric">PR-AUC</td><td><strong>0.863</strong></td><td>0.41</td><td>0.43</td><td>0.712</td></tr>
+          <tr><td class="ev-col-metric">Sensitivity @ 0.5</td><td><strong>0.933</strong></td><td>0.68</td><td>0.71</td><td>0.822</td></tr>
+          <tr><td class="ev-col-metric">Specificity @ 0.5</td><td><strong>0.909</strong></td><td>0.73</td><td>0.70</td><td>0.876</td></tr>
+          <tr><td class="ev-col-metric">Brier Score</td><td><strong>0.071</strong></td><td>0.192</td><td>0.185</td><td>0.108</td></tr>
+          <tr><td class="ev-col-metric">ECE (Calibration)</td><td><strong>0.038</strong></td><td>0.112</td><td>0.098</td><td>0.074</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pearls -->
+    <div class="ev-panel" id="ev-pearls">
+      <div class="ev-heading">Clinical Pearls &amp; Pitfalls</div>
+      <ul class="pearl-list">
+        <li class="pearl-item">
+          <span class="pearl-num">1</span>
+          <span><strong>Lactate is the strongest individual driver.</strong> Even mildly elevated lactate (2–4 mmol/L) substantially increases the predicted risk. Trending lactate over time (rather than relying on a single value) often better reflects the patient's trajectory.</span>
+        </li>
+        <li class="pearl-item">
+          <span class="pearl-num">2</span>
+          <span><strong>MAP &lt; 65 mmHg is a critical threshold.</strong> The model assigns a large positive SHAP contribution when MAP drops below 65 mmHg, consistent with the physiological definition of septic shock. Vasopressor use adds an additional multiplicative effect.</span>
+        </li>
+        <li class="pearl-item">
+          <span class="pearl-num">3</span>
+          <span><strong>Clinical note language matters.</strong> Phrases like "goals of care", "comfort measures", or "worsening" in clinical notes are detected by the BioBERT module and elevate the predicted risk — reflecting real-world documentation practice around deteriorating patients.</span>
+        </li>
+        <li class="pearl-item">
+          <span class="pearl-num">4</span>
+          <span><strong>GCS adds non-linear signal.</strong> The model is especially sensitive to GCS drops below 10. If GCS decline is gradual, consider checking for new structural causes (stroke, mass lesion) alongside metabolic derangements.</span>
+        </li>
+        <li class="pearl-item">
+          <span class="pearl-num">5</span>
+          <span><strong>Use SHAP drivers to guide workup.</strong> If the model's top driver is "Creatinine" rather than vitals, this may prompt an earlier nephrology consult or fluid strategy reassessment before hemodynamic decompensation occurs.</span>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Formula -->
+    <div class="ev-panel" id="ev-formula">
+      <div class="ev-heading">Model Architecture</div>
+      <div class="formula-box">
+Risk Score (48h) =  σ( α·GRU(timeseries₁₈) ⊕ β·BioBERT(notes) ⊕ γ·XGB(tabular) )
+
+Where:
+  GRU(·)      = Temporal GRU encoder (24h window, 18 physiological streams)
+  BioBERT(·)  = Fine-tuned Bio_ClinicalBERT on MIMIC discharge summaries
+  XGB(·)      = Gradient-boosted tree on 47 engineered clinical features
+  ⊕           = Gated cross-modal attention fusion
+  σ(·)        = Sigmoid calibration layer (temperature-scaled)
+  α, β, γ     = Learned modality-weighting coefficients
+
+Output: Calibrated P(mortality within 48h) ∈ [0, 1]
+        Epistemic uncertainty via 30× Monte Carlo dropout
+        Multi-horizon heads: P(mort | 6h), P(mort | 12h), P(mort | 24h), P(mort | 48h)
+      </div>
+      <div class="ev-heading" style="margin-top:20px">Training Details</div>
+      <table class="ev-table">
+        <thead>
+          <tr><th>Parameter</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Dataset</td><td>MIMIC-IV v2.2 (PhysioNet)</td></tr>
+          <tr><td>Training split</td><td>80% train / 10% val / 10% held-out test</td></tr>
+          <tr><td>Positive class</td><td>ICU mortality within 48h of window start</td></tr>
+          <tr><td>Class imbalance handling</td><td>Stratified sampling + focal loss (γ=2)</td></tr>
+          <tr><td>Temporal leakage prevention</td><td>24h lookback window; zero-overlap splits</td></tr>
+          <tr><td>Calibration</td><td>Platt scaling (temperature T=1.3)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /evidence-section -->
+
+</div><!-- /view-calculator -->
+
+<!-- ================================================================
+     PATIENTS VIEW (hidden by default)
+     ================================================================ -->
+<div id="view-patients" class="main-view hidden">
+
+  <!-- Ward Stats Bar -->
+  <div class="ward-stats" id="ward-stats">
+    <div class="stat-card">
+      <div class="stat-icon blue">🛏️</div>
+      <div>
+        <div class="stat-num" id="stat-total">—</div>
+        <div class="stat-lbl">Total Beds Occupied</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon red">🔴</div>
+      <div>
+        <div class="stat-num" id="stat-critical">—</div>
+        <div class="stat-lbl">Critical / High Risk</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon orange">🟡</div>
+      <div>
+        <div class="stat-num" id="stat-moderate">—</div>
+        <div class="stat-lbl">Moderate Risk</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon green">🟢</div>
+      <div>
+        <div class="stat-num" id="stat-low">—</div>
+        <div class="stat-lbl">Low Risk / Stable</div>
       </div>
     </div>
   </div>
 
-  <!-- FOOTER (DR.AI STYLE) -->
-  <footer style="border-top: 1px solid var(--border); padding: 60px 0 36px; margin-top: 80px; background: linear-gradient(180deg, rgba(8, 25, 42, 0.95) 0%, rgba(4, 12, 22, 1) 100%);">
-    <div class="wrap">
-      <div style="display: grid; grid-template-columns: 1.5fr repeat(3, 1fr); gap: 40px; margin-bottom: 48px;">
-        <div>
-          <div class="logo-brand" style="margin-bottom: 14px;">
-            <img src="/static/images/logo.png" alt="MEDGUARD AI Logo" class="brand-logo-img" style="height: 36px; width: 36px;">
-            <div>MEDGUARD<span class="dot">.AI</span></div>
-            <span class="nav-version-tag">Dr.AI Edition</span>
-          </div>
-          <p style="font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 340px;">
-            Next-generation multimodal ICU deterioration forecasting & autonomous clinical copilot platform. Integrating 24-hour continuous vital waves with contemporaneous clinical narrative documentation.
-          </p>
-          <div style="margin-top: 16px; font-size: 12px; color: var(--teal); font-family: var(--font-mono);">
-            ● PhysioNet MIMIC-IV v2.2 Compatible
-          </div>
-        </div>
-
-        <div>
-          <h4 style="color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; font-family: var(--font-mono); letter-spacing: 0.05em;">Clinical Tools</h4>
-          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--body);">
-            <li><a href="#patient-assessment" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Patient Assessment Studio</a></li>
-            <li><a href="#organ-dysfunction" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Digital Twin Organ Map</a></li>
-            <li><a href="#bedside-copilot" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Bedside AI Copilot</a></li>
-            <li><a href="#counterfactual-simulator" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">What-If Simulator</a></li>
-            <li><a href="#icu-calculators" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">ICU Dosing Calculators</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 style="color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; font-family: var(--font-mono); letter-spacing: 0.05em;">AI & Research</h4>
-          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--body);">
-            <li><a href="#simulation-section" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">24h Trajectory Replay</a></li>
-            <li><a href="#explainability-studio" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">SHAP Feature Impact</a></li>
-            <li><a href="#explainability-studio" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Cross-Modal Attention</a></li>
-            <li><a href="#research-benchmark" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Ablation Benchmarks</a></li>
-            <li><a href="#fairness-robustness" style="color: var(--muted); transition: color 0.2s;" onmouseover="this.style.color='#3ECFB2'" onmouseout="this.style.color='var(--muted)'">Fairness & Drift Audits</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h4 style="color: #fff; font-size: 14px; font-weight: 700; text-transform: uppercase; margin-bottom: 16px; font-family: var(--font-mono); letter-spacing: 0.05em;">Compliance & APIs</h4>
-          <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13px; color: var(--body);">
-            <li><a href="/docs" target="_blank" style="color: var(--teal); font-weight: 600;">FastAPI Swagger Docs ↗</a></li>
-            <li><a href="/redoc" target="_blank" style="color: var(--muted);">ReDoc OpenAPI ↗</a></li>
-            <li><span style="color: #64748B;">Apache 2.0 Open License</span></li>
-            <li><span style="color: #64748B;">Research Prototype Only</span></li>
-          </ul>
-        </div>
-      </div>
-
-      <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--muted); flex-wrap: wrap; gap: 14px;">
-        <div>
-          © 2026 MEDGUARD.AI | Dr.AI Edition. All Rights Reserved. Not a certified medical device.
-        </div>
-        <div style="display: flex; gap: 20px;">
-          <span>Zero Temporal Leakage Verified</span>
-          <span>Patient-Level Isolation</span>
-          <span>Temperature Calibrated</span>
-        </div>
-      </div>
+  <!-- Toolbar -->
+  <div class="patients-toolbar">
+    <div class="pt-search-wrap">
+      <span class="pt-search-icon">🔍</span>
+      <input type="text" id="pt-search" placeholder="Search patient, ID, bed…" oninput="filterPatients()">
     </div>
-  </footer>
+    <div class="view-toggle">
+      <button class="view-btn active" id="btn-grid" onclick="switchView('grid')">⊞ Beds</button>
+      <button class="view-btn" id="btn-table" onclick="switchView('table')">☰ Table</button>
+    </div>
+    <button class="filter-btn active" data-risk="all" onclick="setRiskFilter(this,'all')">All</button>
+    <button class="filter-btn" data-risk="critical" onclick="setRiskFilter(this,'critical')">🔴 Critical</button>
+    <button class="filter-btn" data-risk="high" onclick="setRiskFilter(this,'high')">🟠 High</button>
+    <button class="filter-btn" data-risk="moderate" onclick="setRiskFilter(this,'moderate')">🟡 Moderate</button>
+    <button class="filter-btn" data-risk="low" onclick="setRiskFilter(this,'low')">🟢 Low</button>
+    <button class="filter-btn" id="btn-refresh" onclick="loadPatients()" style="margin-left:auto">↻ Refresh</button>
+  </div>
 
-  <!-- Core JavaScript & Animations -->
-  <script src="/static/js/animations.js?v=2.6"></script>
-  <script src="/static/js/app.js?v=2.6"></script>
+  <!-- Bed Grid -->
+  <div class="bed-grid" id="bed-grid">
+    <!-- populated by JS -->
+    <div style="grid-column:1/-1;padding:40px;text-align:center;color:var(--gray-400)">
+      <div class="skeleton" style="width:120px;height:16px;margin:0 auto 10px"></div>
+      <div class="skeleton" style="width:80px;height:12px;margin:0 auto"></div>
+    </div>
+  </div>
+
+  <!-- Table View (hidden initially) -->
+  <div class="pt-table-wrap hidden" id="pt-table-wrap">
+    <table class="pt-table" id="pt-table">
+      <thead>
+        <tr>
+          <th onclick="sortTable('bed')">Bed <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('name')">Patient <span class="sort-icon">↕</span></th>
+          <th onclick="sortTable('age')">Age <span class="sort-icon">↕</span></th>
+          <th>Sex</th>
+          <th>ICU Unit</th>
+          <th onclick="sortTable('risk')">48h Risk % <span class="sort-icon">↕</span></th>
+          <th>Vitals</th>
+          <th>Mortality</th>
+          <th class="td-action">Action</th>
+        </tr>
+      </thead>
+      <tbody id="pt-tbody">
+        <!-- populated by JS -->
+      </tbody>
+    </table>
+  </div>
+
+</div><!-- /view-patients -->
+
+</div><!-- /page-wrapper -->
+
+<!-- ================================================================
+     PATIENT DETAIL SLIDE-OVER
+     ================================================================ -->
+<div class="pt-detail-overlay" id="pt-detail-overlay" onclick="if(event.target===this)closeDetail()">
+  <div class="pt-detail-panel" id="pt-detail-panel">
+    <div class="pt-detail-header" id="pt-detail-header">
+      <div>
+        <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:2px" id="detail-bed-label">BED 101</div>
+        <div style="font-size:18px;font-weight:800" id="detail-name">Patient Name</div>
+      </div>
+      <button class="pt-detail-close" onclick="closeDetail()">✕</button>
+    </div>
+    <div class="pt-detail-body">
+
+      <!-- Risk score big -->
+      <div style="text-align:center;padding:16px 0 20px;border-bottom:1px solid var(--gray-100);margin-bottom:20px">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--gray-400);margin-bottom:4px">48-Hour Mortality Risk</div>
+        <div style="font-size:52px;font-weight:900;color:var(--navy);line-height:1" id="detail-risk-score">—</div>
+        <div style="font-size:14px;color:var(--gray-400);margin-bottom:8px">%</div>
+        <div id="detail-risk-pill" class="risk-pill moderate" style="display:inline-flex">Moderate</div>
+      </div>
+
+      <!-- Demographics -->
+      <div class="pt-detail-section">
+        <div class="pt-detail-section-title">Demographics</div>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="detail-label">Subject ID</span>
+            <span class="detail-val" id="d-subject-id">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Stay ID</span>
+            <span class="detail-val" id="d-stay-id">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Age</span>
+            <span class="detail-val" id="d-age">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Sex</span>
+            <span class="detail-val" id="d-gender">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">ICU Type</span>
+            <span class="detail-val" id="d-icu-type">—</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">Admission</span>
+            <span class="detail-val" id="d-admission">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Latest Vitals -->
+      <div class="pt-detail-section">
+        <div class="pt-detail-section-title">Latest Available Vitals</div>
+        <div class="detail-grid">
+          <div class="detail-item"><span class="detail-label">Heart Rate</span><span class="detail-val" id="d-hr">—</span></div>
+          <div class="detail-item"><span class="detail-label">SBP / MAP</span><span class="detail-val" id="d-bp">—</span></div>
+          <div class="detail-item"><span class="detail-label">SpO₂</span><span class="detail-val" id="d-spo2">—</span></div>
+          <div class="detail-item"><span class="detail-label">Resp Rate</span><span class="detail-val" id="d-rr">—</span></div>
+          <div class="detail-item"><span class="detail-label">GCS</span><span class="detail-val" id="d-gcs">—</span></div>
+          <div class="detail-item"><span class="detail-label">Lactate</span><span class="detail-val" id="d-lactate">—</span></div>
+          <div class="detail-item"><span class="detail-label">Creatinine</span><span class="detail-val" id="d-creatinine">—</span></div>
+          <div class="detail-item"><span class="detail-label">Hemoglobin</span><span class="detail-val" id="d-hgb">—</span></div>
+        </div>
+      </div>
+
+      <!-- Outcome -->
+      <div class="pt-detail-section">
+        <div class="pt-detail-section-title">Outcome (MIMIC-IV Label)</div>
+        <div id="d-mortality-badge"></div>
+      </div>
+
+      <!-- Clinical Notes excerpt -->
+      <div class="pt-detail-section">
+        <div class="pt-detail-section-title">Clinical Notes</div>
+        <div id="d-notes" style="font-size:13px;color:var(--gray-700);line-height:1.6;background:var(--gray-50);padding:12px;border-radius:var(--radius);border:1px solid var(--gray-200)">—</div>
+      </div>
+
+      <!-- Load into calculator -->
+      <button class="load-full-btn" id="detail-load-btn" onclick="loadPatientIntoCalc()">
+        ⚡ Load into Risk Calculator
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<!-- ================================================================
+     FOOTER
+     ================================================================ -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-brand">MEDGUARD.AI</div>
+      <div style="margin-top:4px">Academic research system · MIMIC-IV · Not for clinical diagnosis</div>
+    </div>
+    <div class="footer-links">
+      <a href="#">Terms</a>
+      <a href="#">Privacy</a>
+      <a href="#">Cite</a>
+      <a href="#">GitHub</a>
+      <a href="#">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- App JS -->
+<script src="/static/js/mediguard_app.js"></script>
+<script>
+  // P/F Ratio live update
+  function updatePF() {
+    const pao2 = parseFloat(document.getElementById('n-pao2')?.value || 82);
+    const fio2 = parseFloat(document.getElementById('n-fio2')?.value || 0.4);
+    const pf = (pao2 / fio2).toFixed(0);
+    const el = document.getElementById('score-pf');
+    if (el) el.textContent = pf;
+  }
+  document.getElementById('n-pao2')?.addEventListener('change', updatePF);
+  document.getElementById('n-fio2')?.addEventListener('change', updatePF);
+  window.addEventListener('DOMContentLoaded', updatePF);
+</script>
+
 </body>
 </html>

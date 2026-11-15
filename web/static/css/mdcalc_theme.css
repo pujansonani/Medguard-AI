@@ -1,0 +1,1187 @@
+/* ==============================================================================
+   MDCALC MODERN CLINICAL THEME FOR MEDGUARD AI
+   Inspired by MDCalc (https://www.mdcalc.com/)
+   Clean, authoritative, high-contrast, evidence-based clinical design system
+   ============================================================================== */
+
+:root {
+  /* MDCalc Palette */
+  --mdc-primary: #0284c7;           /* MDCalc Medical Blue */
+  --mdc-primary-hover: #0369a1;
+  --mdc-primary-dark: #075985;
+  --mdc-primary-light: #e0f2fe;
+  
+  --mdc-navy: #0f172a;              /* Deep Slate / Navy */
+  --mdc-navy-light: #1e293b;
+  --mdc-header-bg: #0b1f35;
+  
+  --mdc-bg: #f8fafc;                /* Clinical Clean Slate Background */
+  --mdc-card-bg: #ffffff;           /* Card White */
+  --mdc-border: #e2e8f0;            /* Subtle Border */
+  --mdc-border-hover: #cbd5e1;
+  
+  --mdc-text-main: #0f172a;         /* High Contrast Clinical Text */
+  --mdc-text-muted: #64748b;        /* Muted Text */
+  --mdc-text-subtle: #94a3b8;
+  
+  /* Clinical Status Colors */
+  --mdc-low-bg: #f0fdf4;
+  --mdc-low-border: #86efac;
+  --mdc-low-text: #15803d;
+  
+  --mdc-mod-bg: #fffbeb;
+  --mdc-mod-border: #fcd34d;
+  --mdc-mod-text: #b45309;
+  
+  --mdc-high-bg: #fff1f2;
+  --mdc-high-border: #fecdd3;
+  --mdc-high-text: #be123c;
+  
+  --mdc-crit-bg: #450a0a;
+  --mdc-crit-border: #991b1b;
+  --mdc-crit-text: #fef2f2;
+
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--mdc-bg);
+  color: var(--mdc-text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--mdc-primary);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* --------------------------------------------------------------------------
+   MDCalc Navigation Bar
+   -------------------------------------------------------------------------- */
+.mdc-nav {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--mdc-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.mdc-nav-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 20px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mdc-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none !important;
+}
+
+.mdc-logo-badge {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: white;
+  font-weight: 900;
+  font-size: 18px;
+  padding: 6px 10px;
+  border-radius: var(--radius-md);
+  letter-spacing: -0.5px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 2px 4px rgba(2, 132, 199, 0.25);
+}
+
+.mdc-brand-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.mdc-brand-name {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--mdc-navy);
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+
+.mdc-brand-name span {
+  color: var(--mdc-primary);
+}
+
+.mdc-brand-sub {
+  font-size: 11px;
+  color: var(--mdc-text-muted);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+/* Global Search Bar (MDCalc signature) */
+.mdc-search-wrap {
+  flex: 1;
+  max-width: 520px;
+  position: relative;
+}
+
+.mdc-search-input {
+  width: 100%;
+  height: 40px;
+  background-color: #f1f5f9;
+  border: 1px solid var(--mdc-border);
+  border-radius: 20px;
+  padding: 0 40px 0 42px;
+  font-size: 14px;
+  color: var(--mdc-text-main);
+  transition: all 0.15s ease;
+}
+
+.mdc-search-input:focus {
+  outline: none;
+  background-color: #ffffff;
+  border-color: var(--mdc-primary);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+}
+
+.mdc-search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--mdc-text-muted);
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.mdc-search-shortcut {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background-color: #e2e8f0;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--mdc-text-muted);
+}
+
+.mdc-nav-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mdc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  text-decoration: none !important;
+}
+
+.mdc-btn-secondary {
+  background-color: #ffffff;
+  border-color: var(--mdc-border);
+  color: var(--mdc-text-main);
+}
+.mdc-btn-secondary:hover {
+  background-color: #f8fafc;
+  border-color: var(--mdc-border-hover);
+}
+
+.mdc-btn-primary {
+  background-color: var(--mdc-primary);
+  color: #ffffff;
+}
+.mdc-btn-primary:hover {
+  background-color: var(--mdc-primary-hover);
+}
+
+.mdc-btn-navy {
+  background-color: var(--mdc-navy);
+  color: #ffffff;
+}
+.mdc-btn-navy:hover {
+  background-color: var(--mdc-navy-light);
+}
+
+/* --------------------------------------------------------------------------
+   Sub-Header: Specialty Badges & Calculator Tabs
+   -------------------------------------------------------------------------- */
+.mdc-subnav {
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--mdc-border);
+}
+
+.mdc-subnav-inner {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.mdc-tab-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--mdc-text-muted);
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-decoration: none !important;
+}
+
+.mdc-tab-link:hover {
+  color: var(--mdc-primary);
+}
+
+.mdc-tab-link.active {
+  color: var(--mdc-primary);
+  border-bottom-color: var(--mdc-primary);
+}
+
+/* --------------------------------------------------------------------------
+   Main Layout Container
+   -------------------------------------------------------------------------- */
+.mdc-container {
+  max-width: 1320px;
+  margin: 24px auto 60px;
+  padding: 0 20px;
+}
+
+/* Disclaimer Notice Banner */
+.mdc-disclaimer-banner {
+  background-color: #fefce8;
+  border: 1px solid #fef08a;
+  border-left: 4px solid #ca8a04;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: #854d0e;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+/* Calculator Header Section */
+.mdc-calc-header {
+  margin-bottom: 24px;
+}
+
+.mdc-breadcrumb {
+  font-size: 12px;
+  color: var(--mdc-text-muted);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mdc-calc-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--mdc-navy);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  margin-bottom: 8px;
+}
+
+.mdc-calc-sub {
+  font-size: 15px;
+  color: var(--mdc-text-muted);
+  max-width: 900px;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.mdc-badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.mdc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #f1f5f9;
+  border: 1px solid var(--mdc-border);
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mdc-navy);
+}
+
+.mdc-chip-evidence {
+  background-color: var(--mdc-primary-light);
+  border-color: #bae6fd;
+  color: var(--mdc-primary-dark);
+}
+
+.mdc-chip-mimic {
+  background-color: #ecfdf5;
+  border-color: #a7f3d0;
+  color: #065f46;
+}
+
+/* --------------------------------------------------------------------------
+   Clinical Patient Preset Quick Bar
+   -------------------------------------------------------------------------- */
+.mdc-preset-bar {
+  background-color: #ffffff;
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.mdc-preset-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--mdc-text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mdc-preset-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.mdc-preset-pill {
+  border: 1px solid var(--mdc-border);
+  background-color: #ffffff;
+  color: var(--mdc-navy);
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mdc-preset-pill:hover {
+  background-color: var(--mdc-primary-light);
+  border-color: #38bdf8;
+  color: var(--mdc-primary-dark);
+}
+
+.mdc-preset-pill.active {
+  background-color: var(--mdc-primary);
+  border-color: var(--mdc-primary);
+  color: #ffffff;
+}
+
+/* --------------------------------------------------------------------------
+   Two-Column Calculator Grid
+   -------------------------------------------------------------------------- */
+.mdc-calc-grid {
+  display: grid;
+  grid-template-columns: 1fr 440px;
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .mdc-calc-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Left Column: Clinical Variables & Cards
+   -------------------------------------------------------------------------- */
+.mdc-input-col {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mdc-card {
+  background-color: var(--mdc-card-bg);
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.mdc-card-header {
+  padding: 14px 18px;
+  background-color: #ffffff;
+  border-bottom: 1px solid var(--mdc-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mdc-card-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--mdc-navy);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mdc-card-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--mdc-text-muted);
+  background-color: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.mdc-card-body {
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Form Item / Clinical Variable Row */
+.mdc-var-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.mdc-var-group:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.mdc-var-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mdc-var-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--mdc-text-main);
+}
+
+.mdc-var-normal {
+  font-size: 11px;
+  color: var(--mdc-text-muted);
+  font-family: var(--font-mono);
+}
+
+.mdc-var-alert {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  display: none;
+}
+
+.mdc-var-alert.show {
+  display: inline-block;
+}
+
+/* Segmented Buttons (MDCalc hallmark) */
+.mdc-segmented {
+  display: flex;
+  width: 100%;
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.mdc-seg-btn {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  border: none;
+  background: #ffffff;
+  color: var(--mdc-text-main);
+  border-right: 1px solid var(--mdc-border);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.mdc-seg-btn:last-child {
+  border-right: none;
+}
+
+.mdc-seg-btn:hover {
+  background-color: #f8fafc;
+}
+
+.mdc-seg-btn.active {
+  background-color: var(--mdc-primary);
+  color: #ffffff;
+}
+
+/* Range Slider + Number Input Combo */
+.mdc-slider-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.mdc-slider {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #cbd5e1;
+  outline: none;
+}
+
+.mdc-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--mdc-primary);
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease;
+}
+
+.mdc-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+.mdc-num-wrap {
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  width: 110px;
+}
+
+.mdc-num-input {
+  width: 65px;
+  height: 34px;
+  border: none;
+  padding: 0 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--mdc-navy);
+  font-family: var(--font-mono);
+  text-align: right;
+  outline: none;
+}
+
+.mdc-num-unit {
+  font-size: 11px;
+  color: var(--mdc-text-muted);
+  padding-right: 8px;
+  white-space: nowrap;
+}
+
+/* Clinical Text Area (NLP Modality) */
+.mdc-notes-textarea {
+  width: 100%;
+  min-height: 110px;
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mdc-text-main);
+  resize: vertical;
+  outline: none;
+}
+
+.mdc-notes-textarea:focus {
+  border-color: var(--mdc-primary);
+  box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+}
+
+.mdc-notes-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mdc-tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 24px;
+}
+
+.mdc-ner-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.mdc-ner-drug { background-color: #e0f2fe; color: #0369a1; }
+.mdc-ner-disease { background-color: #fee2e2; color: #b91c1c; }
+.mdc-ner-vital { background-color: #fef3c7; color: #92400e; }
+.mdc-ner-proc { background-color: #ede9fe; color: #6d28d9; }
+
+/* --------------------------------------------------------------------------
+   Right Column: Sticky MDCalc Result Box
+   -------------------------------------------------------------------------- */
+.mdc-result-col {
+  position: sticky;
+  top: 84px;
+}
+
+.mdc-result-box {
+  background-color: #ffffff;
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.mdc-result-header {
+  background-color: var(--mdc-navy);
+  color: #ffffff;
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mdc-result-header-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mdc-live-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #10b981;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.4);
+}
+
+.mdc-result-main {
+  padding: 20px;
+  text-align: center;
+  border-bottom: 1px solid var(--mdc-border);
+}
+
+.mdc-score-display {
+  font-size: 56px;
+  font-weight: 900;
+  color: var(--mdc-navy);
+  line-height: 1;
+  letter-spacing: -1.5px;
+  margin-bottom: 4px;
+  font-family: var(--font-sans);
+}
+
+.mdc-score-label {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--mdc-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.mdc-tier-banner {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.mdc-tier-low {
+  background-color: var(--mdc-low-bg);
+  border: 1px solid var(--mdc-low-border);
+  color: var(--mdc-low-text);
+}
+
+.mdc-tier-moderate {
+  background-color: var(--mdc-mod-bg);
+  border: 1px solid var(--mdc-mod-border);
+  color: var(--mdc-mod-text);
+}
+
+.mdc-tier-high {
+  background-color: var(--mdc-high-bg);
+  border: 1px solid var(--mdc-high-border);
+  color: var(--mdc-high-text);
+}
+
+.mdc-tier-critical {
+  background-color: var(--mdc-crit-bg);
+  border: 1px solid var(--mdc-crit-border);
+  color: var(--mdc-crit-text);
+}
+
+/* Visual Risk Meter */
+.mdc-meter-wrap {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.mdc-meter-track {
+  height: 10px;
+  border-radius: 5px;
+  background: linear-gradient(to right, #10b981 0%, #f59e0b 35%, #ef4444 70%, #991b1b 100%);
+  position: relative;
+  margin-bottom: 6px;
+}
+
+.mdc-meter-needle {
+  position: absolute;
+  top: -4px;
+  width: 4px;
+  height: 18px;
+  background-color: #0f172a;
+  border-radius: 2px;
+  transform: translateX(-50%);
+  transition: left 0.3s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.mdc-meter-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--mdc-text-muted);
+}
+
+.mdc-confidence-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mdc-text-muted);
+  background-color: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-top: 10px;
+}
+
+/* Multi-Horizon Trajectory Block */
+.mdc-section-block {
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--mdc-border);
+}
+
+.mdc-block-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--mdc-text-muted);
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mdc-horizon-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.mdc-horizon-card {
+  background-color: #f8fafc;
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 6px;
+  text-align: center;
+}
+
+.mdc-horizon-hours {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mdc-text-muted);
+}
+
+.mdc-horizon-val {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--mdc-navy);
+  font-family: var(--font-mono);
+}
+
+/* Classical Score Comparison Row */
+.mdc-scores-compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mdc-compare-box {
+  background-color: #f8fafc;
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.mdc-compare-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mdc-text-muted);
+  text-transform: uppercase;
+}
+
+.mdc-compare-num {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--mdc-navy);
+}
+
+.mdc-compare-sub {
+  font-size: 11px;
+  color: var(--mdc-text-muted);
+}
+
+/* SHAP Feature Drivers */
+.mdc-shap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mdc-shap-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+}
+
+.mdc-shap-name {
+  font-weight: 600;
+  color: var(--mdc-text-main);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mdc-shap-bar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 150px;
+}
+
+.mdc-shap-bar-bg {
+  flex: 1;
+  height: 8px;
+  background-color: #f1f5f9;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.mdc-shap-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+}
+.mdc-shap-pos { background-color: #ef4444; }
+.mdc-shap-neg { background-color: #10b981; }
+
+.mdc-shap-pct {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  width: 45px;
+  text-align: right;
+}
+
+/* MDCalc Next Steps & Clinical Recommendations */
+.mdc-guidance-box {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-top: 6px;
+}
+
+.mdc-guidance-title {
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #166534;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.mdc-guidance-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  color: #14532d;
+  line-height: 1.4;
+}
+
+.mdc-guidance-list li {
+  position: relative;
+  padding-left: 14px;
+}
+
+.mdc-guidance-list li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  font-weight: bold;
+  color: #15803d;
+}
+
+/* SBAR EMR Copy Tool */
+.mdc-action-buttons {
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background-color: #f8fafc;
+}
+
+/* --------------------------------------------------------------------------
+   MDCalc Evidence & Clinical Content Tabs (Below the Fold)
+   -------------------------------------------------------------------------- */
+.mdc-evidence-section {
+  margin-top: 48px;
+  background-color: #ffffff;
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.mdc-evidence-tabs-bar {
+  display: flex;
+  border-bottom: 1px solid var(--mdc-border);
+  background-color: #f8fafc;
+}
+
+.mdc-evidence-tab-btn {
+  padding: 14px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--mdc-text-muted);
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mdc-evidence-tab-btn:hover {
+  color: var(--mdc-primary);
+}
+
+.mdc-evidence-tab-btn.active {
+  color: var(--mdc-primary);
+  background-color: #ffffff;
+  border-bottom-color: var(--mdc-primary);
+}
+
+.mdc-evidence-content {
+  padding: 28px;
+}
+
+.mdc-tab-panel {
+  display: none;
+}
+
+.mdc-tab-panel.active {
+  display: block;
+}
+
+.mdc-prose h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--mdc-navy);
+  margin-bottom: 12px;
+}
+
+.mdc-prose h4 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--mdc-navy);
+  margin-top: 18px;
+  margin-bottom: 8px;
+}
+
+.mdc-prose p {
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.6;
+  margin-bottom: 14px;
+}
+
+.mdc-prose ul {
+  padding-left: 20px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.mdc-prose li {
+  margin-bottom: 6px;
+}
+
+/* Evidence Table */
+.mdc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 16px 0;
+}
+
+.mdc-table th {
+  background-color: #f1f5f9;
+  color: var(--mdc-navy);
+  font-weight: 700;
+  text-align: left;
+  padding: 10px 14px;
+  border: 1px solid var(--mdc-border);
+}
+
+.mdc-table td {
+  padding: 10px 14px;
+  border: 1px solid var(--mdc-border);
+  color: #334155;
+}
+
+.mdc-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.mdc-table tr.highlight-row {
+  background-color: #e0f2fe;
+  font-weight: 700;
+}
+
+/* --------------------------------------------------------------------------
+   Embedded Clinical Calculators (Switcher)
+   -------------------------------------------------------------------------- */
+.mdc-calc-card-embedded {
+  background: #ffffff;
+  border: 1px solid var(--mdc-border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-top: 16px;
+}
+
+/* SBAR Modal / Toast */
+.mdc-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background-color: var(--mdc-navy);
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+.mdc-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .mdc-search-wrap {
+    display: none;
+  }
+  .mdc-score-display {
+    font-size: 44px;
+  }
+}
